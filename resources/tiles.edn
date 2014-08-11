@@ -1,0 +1,105 @@
+{"Dwarf"
+  [:dwarf-female 0 0 32 32
+   :dwarf-male 32 0 32 32]
+ "Goblins"
+  [:goblin-slave 0 0 32 32
+   :goblin-slave-dead 32 0 32 32
+   :goblin-warrior 0 32 32 32
+   :goblin-dead 32 32 32 32
+   :goblin-archer 0 64 32 32]
+ "Misc"
+  [:selection 0 0 32 32
+   :blank 0 32 32 32
+   :ministar 32 0 32 32
+   :piety 96 0 16 16
+   :spellPoints 110 0 16 16
+   :stamina 96 16 16 16
+   :health 96 32 16 16
+   :supplies 32 32 32 32
+   :gold 64 32 32 32
+   :green-flag 0 64 32 32
+   :yellow-flag 32 64 32 32
+   :red-flag 64 64 32 32]
+ "Decorations1"
+  [:torch1 0 0 32 32
+   :torch2 32 0 32 32
+   :torch3 64 0 32 32
+   :torch4 96 0 32 32
+   :skeleton-decor 0 32 32 32
+   :wall-flag 32 32 32 32
+   :torch-bracket 64 32 32 32
+   :switch-left 96 32 32 32
+   :switch-right 96 64 32 32]
+ "CastleDungeon"
+  [:castle-floor1 0 0 32 32
+   :castle-wall1 0 32 32 32
+   :castle-wall2 32 32 32 32
+   :castle-wall3 64 32 32 32
+   :castle-wall4 96 32 32 32
+   :castle-wall5 128 32 32 32
+   :castle-wall6 160 32 32 32]
+ "Features"
+  [:stair-down 0 0 32 32
+   :stair-up 32 0 32 32
+   :door-open 96 0 32 32
+   :door-closed 128 0 32 32]
+ "Gui"
+  [:block 0 0 32 32
+   :slot 32 0 32 32
+   :combat-options 64 0 32 32
+   :stats 96 0 32 32
+   :inventory 128 0 32 32
+   :spells 160 0 32 32
+   :options 192 0 32 32
+   :rest 224 0 32 32
+   :map 256 0 32 32
+   :scroll-up 0 32 32 32
+   :scroll-down 32 32 32 32
+   :next-turn 64 32 32 32
+   :combat-mode 96 32 32 32
+   :real-mode 128 32 32 32]
+ "Mouse"
+  [:mouse 0 0 32 32
+   :mouse-select 32 0 32 32
+   :mouse-attack 64 0 32 32
+   :mouse-attack-grey 96 0 32 32
+   :mouse-magic 0 32 32 32
+   :mouse-magic-grey 32 32 32 32
+   :mouse-left 64 32 32 32
+   :mouse-right 96 32 32 32
+   :mouse-arrow 0 96 32 32
+   :mouse-arrow-grey 32 96 32 32]
+ "Spell"
+  [:sleep 0 0 32 32
+   :magic-missile 32 0 32 32]
+ "Missiles"
+  [:missile-javelin 0 0 32 32
+   :missile-arrow 32 0 32 32
+   :missile-magic 64 0 32 32
+   :missile-magic-bolt 96 0 32 32]
+ "Skill"
+  [:unarmed 0 0 32 32
+   :short-blade 32 0 32 32
+   :long-blade 64 0 32 32
+   :axe 96 0 32 32
+   :polearm 128 0 32 32
+   :mace 160 0 32 32
+   :staff 192 0 32 32
+   :throwing 224 0 32 32
+   :bow 0 32 32 32
+   :sling 32 32 32 32
+   :sorcery 64 32 32 32
+   :theology 96 32 32 32
+   :lore 128 32 32 32
+   :healing 160 32 32 32
+   :resistance 192 32 32 32
+   :persistence 224 32 32 32
+   :athletics 0 64 32 32
+   :perception 32 64 32 32
+   :dodge 64 64 32 32
+   :blocking 96 64 32 32
+   :stealth 128 64 32 32
+   :pyromancy 160 64 32 32
+   :black-magic 192 64 32 32
+   :psionics 224 64 32 32
+   :mechanisms 0 96 32 32]}
