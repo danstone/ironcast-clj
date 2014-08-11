@@ -267,10 +267,11 @@
   (>> (nil? @casting)))
 
 (def casting-single?
-  (>> (-> @casting :type (= :single))))
+  (>> (-> @casting :spell-type (= :single))))
 
 (def casting-tile?
-  (>> (-> @casting :type (= :tile))))
+  (>> (-> @casting :spell-type (= :tile))))
+
 
 ;;WORLD
 
@@ -430,6 +431,29 @@
   [action ent pt]
   (act/can? @world ent pt action))
 
+(defn can-act-at-mouse?
+  ([action]
+   (can-act-at-mouse? action (first @selected)))
+  ([action ent]
+   (act/can? @world ent @world-cell action)))
+
+(defn can-act-at-player?
+  ([action]
+   (when-let [player @mouse-in-player]
+     (can-act-at-player? action player)))
+  ([action player]
+   (when-let [pt (pos/pos player)]
+     (can-act? action (first @selected) pt))))
+
+(def current-aoe
+  (>>
+    (let [world @world
+          ent (first @selected)
+          action @casting
+          at @world-cell]
+      (and world first action at
+           (act/aoe world ent at action)))))
+
 (defn act
   [action ent pt]
   (event/put-act! (act/prepare @world ent pt action)))
@@ -440,12 +464,34 @@
   ([action ent]
     (act action ent @world-cell)))
 
+(defn act-at-player
+  ([action]
+   (when-let [player @mouse-in-player]
+     (act-at-player action player)))
+  ([action player]
+   (when-let [pt (pos/pos player)]
+     (act action (first @selected) pt))))
+
 (def player-at-mouse
   (>> (pos/player-at @world @world-cell)))
 
+(def enemy-at-mouse
+  (>> (pos/enemy-at @world @world-cell)))
+
+(def can-cast-at-mouse?
+  (>> (let [spell @casting
+            world @world
+            caster (first (attr/selected world))
+            pt @world-cell]
+        (when (and spell caster)
+          (case (:spell-type spell)
+            :single (act/can? world caster pt spell)
+            true)))))
+
+
 (def current-spells
   "Return the list of spells for the current selected entity"
-  (>> [spell/magic-missiles]))
+  (>> [spell/magic-missiles spell/sleep-touch]))
 
 (def dwarves ["Sleepy" "Bashful" "Grumpy" "Dopey" "Doc" "Sneezy"])
 

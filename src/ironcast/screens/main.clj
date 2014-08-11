@@ -26,9 +26,7 @@
 (defn in-game-mouse
   [x y]
   (cond
-    (and @api/casting-single?
-         @api/player-at-mouse) (mouse/draw-casting-mouse! x y)
-    @api/casting-tile? (mouse/draw-casting-mouse! x y)
+    @api/can-cast-at-mouse? (mouse/draw-casting-mouse! x y)
     @api/casting (mouse/draw-grey-casting-mouse! x y)
     @api/player-at-mouse (mouse/draw-select-mouse! x y)
     :otherwise (gfx/draw-sprite! (api/sprite (or @mouse-sprite :mouse)) x y)))

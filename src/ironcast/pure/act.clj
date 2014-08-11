@@ -15,9 +15,34 @@
   [world ent pt action]
   (could? world ent pt action))
 
+(defmulti aoe (fn [_ _ _ action] (:type action)))
+(defmethod aoe :default
+  [world ent pt action]
+  (list pt))
+
 (defmulti prepare (fn [_ _ _ action] (:type action)))
 
+(defmethod prepare :default
+  [_ action]
+  action)
+
 (defmulti try-perform (fn [_ action] (:type action)))
+
+(defmethod try-perform :default
+  [world _]
+  (success world))
+
+(defmulti console-log (fn [_ action] (:type action)))
+
+(defmethod console-log :default
+  [world action]
+  nil)
+
+(defmulti log (fn [world action] (:type action)))
+
+(defmethod log :default
+  [world action]
+  nil)
 
 ;;MOVE
 (defn can-move?
@@ -49,6 +74,10 @@
 (defmethod try-perform :move
   [world action]
   (try-perform-move world action))
+
+(defmethod console-log :move
+  [world action]
+  (str-words "Moving" (:ent action) "to" (:to action)))
 
 ;;OPEN
 (def open-action
@@ -84,6 +113,10 @@
 (defmethod try-perform :open
   [world action]
   (try-perform-open world action))
+
+(defmethod console-log :open
+  [_ _]
+  (str-words "Opening door..."))
 
 ;;CLOSE
 (def close-action
@@ -121,6 +154,9 @@
   [world action]
   (try-perform-close world action))
 
+(defmethod console-log :close
+  [_ _]
+  (str-words "Closing door..."))
 
 ;; ATTACK
 (def attack-action
@@ -160,6 +196,15 @@
   [world action]
   (try-perform-attack world action))
 
+(defmethod console-log :attack
+  [world action]
+  (str-words (:ent action) "Attacks" (:target action)))
+
+(defmethod log :attack
+  [world action]
+  [(console-log world action)])
+
+
 ;; TRIP
 (def trip-action
   {:type :trip
@@ -190,6 +235,16 @@
 (defmethod try-perform :trip
   [world action]
   (try-perform-trip world action))
+
+(defmethod console-log :trip
+  [world action]
+  (str-words (:ent action) "Trips" (:target action)))
+
+(defmethod log :trip
+  [world action]
+  [(console-log world action)])
+
+;; DEFAULTS
 
 (def default-actions
   [move-action

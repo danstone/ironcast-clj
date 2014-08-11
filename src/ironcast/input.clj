@@ -2,7 +2,8 @@
   (:require [ironcast.api :as api]
             [ironcast.util :refer :all]
             [clj-tuple :refer [tuple]]
-            [ironcast.pure.act :as act]))
+            [ironcast.pure.act :as act]
+            [ironcast.pure.spell :as spell]))
 
 
 (defn handle-cam
@@ -93,21 +94,29 @@
         first))
   nil)
 
-;
-;(defn handle-cast
-;  [handled comms]
-;  (when (and @api/casting
-;             (comms :select))
-;    (cond @api/mouse-in-game? (api/cast-at-mouse)
-;          (and
-;            @api/casting-single?
-;            @api/mouse-in-player) (api/cast-at-player))))
+
+(defn handle-cast
+  [handled comms]
+  (when-let [spell @api/casting]
+    (when (comms :select)
+      (cond
+        (and @api/mouse-in-game?
+             (api/can-act-at-mouse? spell))
+
+        (do (api/act-at-mouse spell)
+            (api/end-cast))
+
+        (and @api/mouse-in-player
+             (api/can-act-at-player? spell))
+
+        (do (api/act-at-player spell)
+                  (api/end-cast))))))
 
 (defn handle-cancel
   [handled comms]
   (when (comms :cancel)
     (cond @api/casting (api/end-cast))
-    (conj handled :info)))
+    (conj handled :cancel)))
 
 (defn only-in-game
   [f]
@@ -134,6 +143,14 @@
               @api/player?)
       (f handled comms))))
 
+
+(defn not-when-casting
+  [f]
+  (fn [handled comms]
+    (when (not @api/casting)
+      (f handled comms))))
+
+
 (defn handler
   [f]
   (fn [handled comms]
@@ -149,25 +166,34 @@
 
   (map handler
        [(-> handle-lasso-selection
-            (only-in-mode :real))
+            (only-in-mode :real)
+            not-when-casting)
 
         (-> handle-selection
             only-in-game
-            only-realtime-or-player)
+            only-realtime-or-player
+            not-when-casting)
 
         (-> handle-key-selection
             only-in-game
-            only-realtime-or-player)
+            only-realtime-or-player
+            not-when-casting)
 
         (-> handle-player-selection
-            only-realtime-or-player)
+            only-realtime-or-player
+            not-when-casting)
 
         (-> handle-default-actions
             only-in-game
-            only-realtime-or-player)
+            only-realtime-or-player
+            not-when-casting)
 
         (-> handle-other-action
             only-in-game
+            only-realtime-or-player
+            not-when-casting)
+
+        (-> handle-cast
             only-realtime-or-player)
 
         handle-cancel

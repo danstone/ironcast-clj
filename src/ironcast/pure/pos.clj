@@ -69,6 +69,14 @@
 
 (def player-at? (comp boolean player-at))
 
+(defn enemy-at
+  [world pt]
+  (first (filter #(enemy? world %) (at world pt))))
+
+(def enemy-at? (comp boolean enemy-at))
+
+
+
 (defn in
   [world rect]
   (ats world (rect-pts rect)))

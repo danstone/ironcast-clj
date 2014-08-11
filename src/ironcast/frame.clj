@@ -59,6 +59,18 @@
 (def updater (agent nil))
 (def gdx-input (input/->GdxInput))
 
+
+(defn sync-casting-aoe!
+  []
+  (let [spell @api/casting]
+    (if (and @api/mouse-in-game? spell)
+      (swap! state/ui assoc
+             :casting-aoe
+             @api/current-aoe)
+      (swap! state/ui dissoc
+             :casting-aoe))))
+
+
 (defn frame-background
   []
   (try
@@ -74,6 +86,7 @@
                              force-selection
                              (tick-missiles delta))))
     (fire-missiles!)
+    (sync-casting-aoe!)
     (api/update-world filter-missiles)
     (catch Exception e)))
 

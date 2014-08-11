@@ -44,10 +44,11 @@
 
 (defn draw
   []
-  (let [ent (first @api/selected)
-        pt @api/world-cell
-        world @state/world
-        actions (api/other-actions ent pt)]
-    (when (and ent (seq actions))
-      (draw-actions world ent actions))))
+  (when-not @api/casting
+    (let [ent (first @api/selected)
+          pt @api/world-cell
+          world @state/world
+          actions (api/other-actions ent pt)]
+      (when (and ent (seq actions))
+        (draw-actions world ent actions)))))
 

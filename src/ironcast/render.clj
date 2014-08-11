@@ -15,6 +15,7 @@
     (gfx/set-cam! cam)
     (draw-world world)
     (base/draw-path!)
+    (base/draw-aoe!)
     (base/draw-lasso!)
     (gfx/release-cam! cam)))
 

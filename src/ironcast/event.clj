@@ -13,8 +13,6 @@
   [action]
   (async/put! act-chan action))
 
-(defmulti console-act-log :type)
-(defmulti act-log (fn [world event] (:type event)))
 (defmulti act-world-text (fn [world event] (:type event)))
 (defmulti act-applied (fn [world event] (:type event)))
 
@@ -23,7 +21,8 @@
     (async/tap act-mult c)
     (go-loop
       []
-      (console-act-log (<! c))
+      (when-let [msg (act/console-log @state/world (<! c))]
+        (println msg))
       (recur))))
 
 
@@ -34,7 +33,7 @@
           [nw success?] (act/applicate w event)]
       (when success?
         (ref-set state/world nw)
-        (when-let [l (act-log nw event)]
+        (when-let [l (act/log nw event)]
           (alter state/log #(apply conj % l)))
         (alter state/world-text concat (act-world-text nw event))))))
 
@@ -50,28 +49,6 @@
         (catch Exception e
                (.printStackTrace ^Exception e)))
       (recur))))
-
-(defmethod console-act-log :default
-           [event]
-  (println "Attempting an action..." (:type event :unknown)))
-
-(defmethod console-act-log :move
-  [event]
-  (println "Moving" (:ent event) "to" (:to event)))
-
-(defmethod console-act-log :open
-  [event]
-  (println "Opening door..."))
-
-(defmethod console-act-log :trip
-  [event]
-  (println "Tripping"))
-
-(defmethod act-world-text :default [_ _] nil)
-
-(defmethod act-log :default
-           [world event]
-  ["Something happened..."])
 
 (defmethod act-applied :default [_ _] nil)
 

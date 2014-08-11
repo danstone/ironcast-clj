@@ -11,27 +11,48 @@
     :self
     :item})
 
-(defmulti cast-tile (fn [_ _ spell _] (:name spell)))
-(defmulti affects? (fn [_ _ spell _] (:name spell)))
+(defn single?
+  [spell]
+  (= (:spell-type spell) :single))
+
+(defn tile?
+  [spell]
+  (= (:spell-type spell) :tile))
+
+
+;;MAGIC MISSILES
 
 (def magic-missiles
   {:name :magic-missiles
    :text "Magic Missiles"
    :sprite :magic-missile
-   :type :tile})
+   :type :magic-missiles
+   :spell-type :tile})
 
 (defn magic-missiles-missile
   [from to caster n]
   (assoc (missile from to)
-    :type :spell
+    :type :magic-missiles-strike
     :sprite :missile-magic-bolt
     :caster caster
     :spell magic-missiles
     :times n))
 
-(defn magic-missiles-cast
-  [world caster spell [x y]]
-  (let [aoe (square x y 3)
+(defmethod applies? :magic-missiles
+  [world caster pt _]
+  (enemy-of-at? world caster pt))
+
+(defmethod could? :magic-missiles
+  [world caster pt _]
+  true)
+
+(defmethod aoe :magic-missiles
+  [world caster [x y] spell]
+  (square x y 3))
+
+(defmethod prepare :magic-missiles
+  [world caster pt spell]
+  (let [aoe (aoe world caster pt spell)
         enemies (enemies-of-in-pts world caster aoe)
         freq (->> enemies cycle (take (count aoe)) frequencies)
         from (pos world caster)
@@ -39,14 +60,44 @@
                         (magic-missiles-missile from
                                                 (pos world target)
                                                 caster n)) freq)]
-    (reduce add-missile world missiles)))
+    (merge spell {:missiles missiles})))
 
+(defmethod try-perform :magic-missiles
+  [world spell]
+  (success (reduce add-missile world (:missiles spell))))
 
+(defmethod console-log :magic-missiles
+  [world spell]
+  "Cast Magic Missiles")
 
-(defmethod affects? :magic-missiles
-  [world caster _ pt]
-  (enemy-of-at? world caster pt))
+(defmethod console-log :magic-missiles-strike
+  [world missile]
+  (str-words "Magic Missiles hit" (:times missile) "times"))
 
-(defmethod cast-tile :magic-missiles
-  [world caster spell pt]
-  (success (magic-missiles-cast world caster spell pt)))
+;;SLEEP TOUCH
+
+(def sleep-touch
+  {:name :sleep-touch
+   :text "Sleep Touch"
+   :sprite :sleep
+   :type :sleep-touch
+   :spell-type :single})
+
+(defmethod could? :sleep-touch
+  [world caster pt _]
+  (and
+    (pos-adj? world caster pt)
+    (enemy-of-at? world caster pt)))
+
+(defmethod prepare :sleep-touch
+  [world caster pt spell]
+  spell)
+
+(defmethod try-perform :sleep-touch
+  [world spell]
+  (success world))
+
+(defmethod console-log :sleep-touch
+  [world spell]
+  "Cast Sleep Touch")
+

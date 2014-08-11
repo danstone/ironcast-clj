@@ -73,6 +73,30 @@
         :green
         (gfx/draw-border! @api/blank lasso 1)))))
 
+
+(defn draw-aoe!
+  []
+  (when (or @api/player? @api/real?)
+    (when-let [aoe (:casting-aoe @state/ui)]
+      (let [height (:height @state/world)
+            spr (api/sprite :ministar)
+            caster (first @api/selected)
+            spell @api/casting]
+        (when (and caster spell)
+          (doseq [[wx wy :as pt] aoe
+                  :let [x (* wx 32)
+                        y (* (- height wy 1) 32)]]
+            (if (api/act-applies? spell caster pt)
+              (gfx/with-color :light-yellow
+                (gfx/draw-sprite! spr
+                                  (+ x 12)
+                                  (- y 12)))
+              (gfx/with-color :off-white
+                (gfx/draw-sprite! spr
+                                  (+ x 12)
+                                  (- y 12))))))))))
+
+
 (defn draw-path!
   []
   (when-let [path @api/ui-path]

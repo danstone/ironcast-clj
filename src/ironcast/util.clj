@@ -51,6 +51,10 @@
   [str]
   (str/split str #"\s"))
 
+(defn str-words
+  [& str]
+  (str/join " " str))
+
 (defn map-values
   [f mapcoll]
   (into {} (map (fn [[k v]] [k (f v)]) mapcoll)))

@@ -45,6 +45,16 @@
                 (with-color color (draw-sprite! spr x y)))
               (-> world :with-flag flag))))
 
+
+(defn draw-missiles
+  [world]
+  (let [height (:height world)]
+    (doseq [{:keys [from sprite]} (:missiles world)]
+      (let [[x y] from]
+        (draw-sprite! (api/sprite sprite)
+                      x
+                      (- (* 32 height) y 32))))))
+
 (defn draw-world
   "Draws the world!"
   [world]
@@ -53,5 +63,6 @@
   (draw-by-flag world :decor)
   (draw-circles world :enemy :red)
   (draw-circles world :selected :green)
-  (draw-by-flag world :creature))
+  (draw-by-flag world :creature)
+  (draw-missiles world))
 
