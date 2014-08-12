@@ -44,6 +44,12 @@
   [world action]
   nil)
 
+(defmulti world-text (fn [world action] (:type action)))
+
+(defmethod world-text :default
+  [world action]
+  nil)
+
 ;;MOVE
 (defn can-move?
   [world ent pt]

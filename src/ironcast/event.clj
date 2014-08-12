@@ -13,7 +13,6 @@
   [action]
   (async/put! act-chan action))
 
-(defmulti act-world-text (fn [world event] (:type event)))
 (defmulti act-applied (fn [world event] (:type event)))
 
 (defonce console-act-logger
@@ -35,7 +34,8 @@
         (ref-set state/world nw)
         (when-let [l (act/log nw event)]
           (alter state/log #(apply conj % l)))
-        (alter state/world-text concat (act-world-text nw event))))))
+        (when-let [wt (act/world-text nw event)]
+          (alter state/world-text concat wt))))))
 
 (defonce act-applier
   (let [c (chan)]
