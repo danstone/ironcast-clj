@@ -13,7 +13,16 @@
     (gfx/draw-backed-box! @api/blank x y w h :green)
     (draw-hover-border! x y w h)))
 
-
+(defn draw-stats
+  [x y player]
+  (let [world @state/world]
+    (let [[hp max-hp] (attr/hp world player)
+          [ap max-ap] (attr/ap world player)
+          text (str
+                 "hp: " hp "/" max-hp "\n"
+                 "ap: " ap "/" max-ap " \n"
+                 "fatigue: " (attr/fatigue world player))]
+      (draw-text! text (+ x 4) (- y 96)))))
 
 (defn draw-player
   [x y player]
@@ -27,11 +36,7 @@
                         (+ x 3)
                         (- y 3))
         (gfx/draw-sprite! sprite (+ x 16) (- y 96) 64 64)
-        (let [[hp max-hp] (attr/hp @state/world player)
-              [ap max-ap] (attr/ap @state/world player)]
-          (gfx/draw-text! @api/default-font (str
-                                              hp "/" max-hp " hp\n"
-                                              ap "/" max-ap " ap") (+ x 4) (- y 96)))))))
+        (draw-stats x y player)))))
 
 (defn draw-players
   []
