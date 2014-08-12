@@ -281,6 +281,9 @@
     (apply alter world f args))
   nil)
 
+(def world-height
+  (>> (:height @world 32)))
+
 (def mode
   (>> (:mode @world :real)))
 

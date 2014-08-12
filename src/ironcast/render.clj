@@ -17,6 +17,7 @@
     (base/draw-path!)
     (base/draw-aoe!)
     (base/draw-lasso!)
+    (base/draw-world-text!)
     (gfx/release-cam! cam)))
 
 

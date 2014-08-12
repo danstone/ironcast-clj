@@ -210,6 +210,18 @@
   [world action]
   [(console-log world action)])
 
+(defn text-on-target
+  [world action text & {:keys [color]}]
+  {:pos (pos world (:target action))
+   :text text
+   :time 0.0
+   :color (or color :white)})
+
+(defmethod world-text :attack
+  [world action]
+  [(text-on-target
+     world action "1" :color :red)])
+
 
 ;; TRIP
 (def trip-action

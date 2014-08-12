@@ -54,7 +54,7 @@
     (set! (. cfg width) (setting :width 1024))
     (set! (. cfg height) (setting :height 768))
     (set! (. cfg fullscreen) (setting :fullscreen? false))
-    (set! (. cfg title) "Hello")
+    (set! (. cfg title) "Ironcast 0.1.0")
     (set! (. cfg vSyncEnabled) (setting :vsync? false))
     (set! (. cfg foregroundFPS) (setting :max-fps 60))
     (set! (. cfg backgroundFPS) (setting :max-fps 60))

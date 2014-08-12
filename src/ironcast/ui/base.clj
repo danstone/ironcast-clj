@@ -78,7 +78,7 @@
   []
   (when (or @api/player? @api/real?)
     (when-let [aoe (:casting-aoe @state/ui)]
-      (let [height (:height @state/world)
+      (let [height @api/world-height
             spr (api/sprite :ministar)
             caster (first @api/selected)
             spell @api/casting]
@@ -95,6 +95,18 @@
                 (gfx/draw-sprite! spr
                                   (+ x 12)
                                   (- y 12))))))))))
+
+(defn draw-world-text!
+  []
+  (let [height @api/world-height
+        font @api/default-font]
+    (doseq [{:keys [text color pos time]} @state/world-text
+            :let [[x y] pos
+                  x (+ (* x 32) 12)
+                  y (* (+ height (- y) time) 32)]]
+      (gfx/with-font-color
+        font color
+        (gfx/draw-text! font text x y)))))
 
 
 (defn draw-path!

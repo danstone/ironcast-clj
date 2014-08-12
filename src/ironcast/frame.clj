@@ -59,6 +59,16 @@
 (def updater (agent nil))
 (def gdx-input (input/->GdxInput))
 
+(defn tick-world-text
+  [world-text delta]
+  (for [text world-text
+        :when (< (:time text) 1.5)]
+    (update text :time + delta)))
+
+(defn tick-world-text!
+  [delta]
+  (dosync
+    (commute state/world-text tick-world-text delta)))
 
 (defn sync-casting-aoe!
   []
@@ -82,6 +92,7 @@
     (handle-all @state/commands)
     (swap! state/ui ui/update-ui @state/input @state/cam @state/world)
     (let [delta @api/delta]
+      (tick-world-text! delta)
       (api/update-world #(-> %
                              force-selection
                              (tick-missiles delta))))
