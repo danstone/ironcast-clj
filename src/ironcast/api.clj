@@ -426,6 +426,12 @@
   [ent pt]
   (first (default-actions ent pt)))
 
+(defn can-afford?
+  ([action ent]
+   (act/can-afford? @world ent action))
+  ([action]
+   (can-afford? action (first @selected))))
+
 (defn act-applies?
   [action ent pt]
   (act/applies? @world ent pt action))

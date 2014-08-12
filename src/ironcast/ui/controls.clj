@@ -160,11 +160,13 @@
 
 (defn draw-spell
   [x y spell]
-  (draw-hover-sprite!
-    (api/sprite (:sprite spell))
-    x y
-    32 32
-    32 32))
+  (let [color (cond
+                (not (api/can-afford? spell)) :grey
+                (api/mouse-in? x (+ y 32) 32 32) :white
+                :else :off-white)]
+    (gfx/with-color
+      color
+      (gfx/draw-sprite! (api/sprite (:sprite spell)) x y 32 32))))
 
 (defn draw-spell-hover
   [x y spell]
@@ -180,11 +182,11 @@
   [x y]
   (let [spells (map-indexed tuple @api/current-spells)]
     (doseq [[i spell] spells]
-      (draw-spell (+ x (* i 32)) y spell))
-    (doseq [[i spell] spells]
+      (draw-spell (+ x (* i 32)) y spell)
       (when (api/mouse-in? (+ x (* i 32)) (+ y 32) 32 32)
         (draw-spell-hover (+ x (* i 32)) y spell))
-      (when (api/click-in? (+ x (* i 32)) (+ y 32) 32 32)
+      (when (and (api/click-in? (+ x (* i 32)) (+ y 32) 32 32)
+                 (api/can-afford? spell))
         (api/begin-cast spell)))))
 
 (defn draw-action-bar

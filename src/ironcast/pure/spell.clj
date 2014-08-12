@@ -81,7 +81,8 @@
    :text "Sleep Touch"
    :sprite :sleep
    :type :sleep-touch
-   :spell-type :single})
+   :spell-type :single
+   :cost 3})
 
 (defmethod could? :sleep-touch
   [world caster pt _]
@@ -91,7 +92,7 @@
 
 (defmethod prepare :sleep-touch
   [world caster pt spell]
-  spell)
+  (assoc spell :ent caster))
 
 (defmethod try-perform :sleep-touch
   [world spell]
