@@ -300,6 +300,14 @@
   [world]
   (reduce refresh-ap world (enemies world)))
 
+(defn fatigue
+  [world ent]
+  (attr world ent :fatigue 0))
+
+(defn add-fatigue
+  [world ent amount]
+  (update-attr world ent :fatigue #(+ (or % 0) amount)))
+
 (defn path-sprite
   [world ent total]
   (let [ap (current-ap world ent)]
@@ -307,3 +315,4 @@
       (<= total (/ ap 2)) :green-flag
       (<= total ap) :yellow-flag
       :otherwise :red-flag)))
+
