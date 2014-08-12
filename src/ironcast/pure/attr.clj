@@ -56,7 +56,7 @@
 
 (defn update-attr
   [world ent attr f & args]
-  (apply world update-in [:attr ent attr] f args))
+  (apply update-in world [:attr ent attr] f args))
 
 (defn rem-attr
   [world ent attr]

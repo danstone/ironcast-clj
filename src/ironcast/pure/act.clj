@@ -227,7 +227,8 @@
 (def trip-action
   {:type :trip
    :name "Trip"
-   :cost 3})
+   :cost 3
+   :fatigue 10})
 
 (defn can-trip?
   [world ent pt]
@@ -295,8 +296,17 @@
     (attr/sub-ap world (:ent action) (:cost action))
     world))
 
+(defn charge-fatigue
+  [world action]
+  (if (and (:fatigue action)
+           (:ent action))
+    (attr/add-fatigue world (:ent action) (:fatigue action))
+    world))
+
 (defn applicate
   [world action]
   (try-state [world world]
    (try-perform world action)
-   (success (charge-cost world action))))
+   (success (-> world
+                (charge-cost action)
+                (charge-fatigue action)))))
