@@ -102,7 +102,8 @@
         font @api/default-font]
     (doseq [{:keys [text color pos time]} @state/world-text
             :let [[x y] pos
-                  x (+ (* x 32) 12)
+                  [w _] (gfx/text-bounds font text)
+                  x (+ (* x 32) 16 (/ w -2))
                   y (* (+ height (- y) time) 32)]]
       (gfx/with-font-color
         font color

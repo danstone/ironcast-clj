@@ -210,6 +210,13 @@
   [world action]
   [(console-log world action)])
 
+(defn text-on-ent
+  [world action text & {:keys [color]}]
+  {:pos (pos world (:ent action))
+   :text text
+   :time 0.0
+   :color (or color :white)})
+
 (defn text-on-target
   [world action text & {:keys [color]}]
   {:pos (pos world (:target action))

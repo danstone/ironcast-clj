@@ -30,11 +30,11 @@
    :spell-type :tile})
 
 (defn magic-missiles-missile
-  [from to caster n]
-  (assoc (missile from to)
+  [world from target n]
+  (assoc (missile from (pos world target))
+    :target target
     :type :magic-missiles-strike
     :sprite :missile-magic-bolt
-    :caster caster
     :spell magic-missiles
     :times n))
 
@@ -57,10 +57,13 @@
         freq (->> enemies cycle (take (count aoe)) frequencies)
         from (pos world caster)
         missiles (map (fn [[target n]]
-                        (magic-missiles-missile from
-                                                (pos world target)
-                                                caster n)) freq)]
-    (merge spell {:missiles missiles})))
+                        (magic-missiles-missile world
+                                                from
+                                                target
+                                                n)) freq)]
+    (assoc spell
+      :missiles missiles
+      :ent caster)))
 
 (defmethod try-perform :magic-missiles
   [world spell]
@@ -73,6 +76,17 @@
 (defmethod console-log :magic-missiles-strike
   [world missile]
   (str-words "Magic Missiles hit" (:times missile) "times"))
+
+(defmethod world-text :magic-missiles
+  [world spell]
+  [(text-on-ent
+      world spell "*Magic Missiles*")])
+
+(defmethod world-text :magic-missiles-strike
+  [world spell]
+  [(text-on-target
+     world spell (str (:times spell))
+      :color :light-blue)])
 
 ;;SLEEP TOUCH
 
@@ -92,7 +106,8 @@
 
 (defmethod prepare :sleep-touch
   [world caster pt spell]
-  (assoc spell :ent caster))
+  (assoc spell :ent caster
+               :target (enemy-of-at world caster pt)))
 
 (defmethod try-perform :sleep-touch
   [world spell]
@@ -101,4 +116,13 @@
 (defmethod console-log :sleep-touch
   [world spell]
   "Cast Sleep Touch")
+
+(defmethod world-text :sleep-touch
+  [world spell]
+  [(text-on-ent
+     world spell "*Sleep Touch*")
+   (text-on-target
+     world spell "zzz"
+     :color :light-green)])
+
 
