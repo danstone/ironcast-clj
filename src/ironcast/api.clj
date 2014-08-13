@@ -454,7 +454,7 @@
    (when-let [pt (pos/pos player)]
      (can-act? action (first @selected) pt))))
 
-(def current-aoe
+(def current-act-aoe
   (>>
     (let [world @world
           ent (first @selected)
@@ -462,6 +462,13 @@
           at @world-cell]
       (and world first action at
            (act/aoe world ent at action)))))
+
+(def current-act-descr
+  (>> (when-let [act @casting]
+         (act/descr @world
+                    (first @selected)
+                    @world-cell
+                    act))))
 
 (defn act
   [action ent pt]

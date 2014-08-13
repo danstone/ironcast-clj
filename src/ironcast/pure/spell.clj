@@ -19,7 +19,6 @@
   [spell]
   (= (:spell-type spell) :tile))
 
-
 ;;MAGIC MISSILES
 
 (def magic-missiles
@@ -27,7 +26,8 @@
    :text "Magic Missiles"
    :sprite :magic-missile
    :type :magic-missiles
-   :spell-type :tile})
+   :spell-type :tile
+   :cost 3})
 
 (defn magic-missiles-missile
   [world from target n]
@@ -87,6 +87,17 @@
   [(text-on-target
      world spell (str (:times spell))
       :color :light-blue)])
+
+(defmethod descr :magic-missiles
+  [world caster pt spell]
+  [[:light-yellow (str "Magic Missiles (" (:cost spell "???") "AP)")]
+   "- Fires several missiles in area of effect"
+   "- One missile per cell in area"
+   "- Area of effect increases with experience"
+   "- Excess missiles will strike closest enemy"
+   [:light-green "- Each missile does 1d6 physical damage"]
+   [:light-blue "- There is no resistence check against this spell"]
+   [:light-blue "- There is no persistence check against this spell"]])
 
 ;;SLEEP TOUCH
 

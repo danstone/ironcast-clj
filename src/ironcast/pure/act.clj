@@ -50,6 +50,12 @@
   [world action]
   nil)
 
+(defmulti descr (fn [world ent pt action] (:type action)))
+
+(defmethod descr :default
+  [_ _ _ action]
+  [(str (:type action) " ???")])
+
 ;;MOVE
 (defn can-move?
   [world ent pt]

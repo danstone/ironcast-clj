@@ -81,9 +81,9 @@
                (draw-log-message font m x (- y (* i 18))))
              (take max-lines log)))))
 
-(defn draw-casting-descr
+(defn draw-act-descr
   [x y max-lines]
-  (let [descr nil #_@api/current-spell-descr
+  (let [descr @api/current-act-descr
         descr (drop (int (:casting-scroll @state/ui 0)) descr)
         [_ by] @api/bottom-left
         font @api/default-font]
@@ -110,7 +110,7 @@
         x (int (+ 4 x))
         max (int (/ h 18))]
     (cond
-      false #_@api/casting (draw-casting-descr x y max)
+      @api/casting (draw-act-descr x y max)
       :otherwise (draw-log x y max))))
 
 

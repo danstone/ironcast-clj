@@ -76,7 +76,7 @@
     (if (and @api/mouse-in-game? spell)
       (swap! state/ui assoc
              :casting-aoe
-             @api/current-aoe)
+             @api/current-act-aoe)
       (swap! state/ui dissoc
              :casting-aoe))))
 
