@@ -54,7 +54,7 @@
 
 (defmethod descr :default
   [_ _ _ action]
-  [(str (:type action) " ???")])
+  [(str-words (:type action "???") (:cost action "???") "AP")])
 
 ;;MOVE
 (defn can-move?
