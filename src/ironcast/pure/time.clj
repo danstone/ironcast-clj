@@ -1,8 +1,7 @@
 (ns ironcast.pure.time
   (:require [ironcast.util :refer :all]
             [ironcast.pure
-             [attr :refer [clear-attr] :as attr]]
-            [ironcast.pure.ai :as ai]))
+             [attr :refer [clear-attr] :as attr]]))
 
 (defn stop-motion
   "Remove all known paths and move-goals effectively
@@ -11,11 +10,15 @@
   (-> (clear-attr world :path)
       (clear-attr :move-goal)))
 
+(defn clear-done
+  [world]
+  (dissoc world :done))
+
 (defn into-turns
   [world mode]
   (-> world
       stop-motion
-      ai/clear-done
+      clear-done
       (assoc :mode mode)))
 
 (defn real

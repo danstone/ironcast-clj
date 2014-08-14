@@ -75,6 +75,7 @@
 (defn do-ai
   [ent]
   (let [world @state/world]
+    (swap! state/ai-state assoc ent (ai/observe world ent))
     (when (and (not (ai/done? world ent))
                (not (time/player? world)))
       (api/update-world ai/done ent))))
@@ -83,7 +84,11 @@
   [ent]
   (looper
     (api/setting :ai-ms 1000)
-    (do-ai ent)))
+    (try
+      (do-ai ent)
+      (catch Throwable t
+        (.printStackTrace t)
+        (api/update-world attr/rem-flag ent :ai)))))
 
 (defn ai-adds
   []

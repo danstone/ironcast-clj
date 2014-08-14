@@ -41,3 +41,25 @@
                  :when (<= (manhattan-dist a p) range)]
              p)
            (into #{})))))
+
+(defn visible-from
+  "Find the sequence of entities visible from `pt`"
+  [world entities range pt]
+  (for [e entities
+        :let [to (pos world e)]
+        :when (and (not= pt to)
+                   (<= (manhattan-dist pt to) range)
+                   (los? world pt to))]
+    e))
+
+(defn visible-by
+  "Find the sequence of entities visible by `entity`"
+  [world ent entities]
+  (visible-from world entities 5 (pos world ent)))
+
+(defn visible-by-sorted
+  "Find the sequence of entities visible by `entity` sorted by distance"
+  [world ent entities]
+  (->>
+    (visible-by world ent entities)
+    (sort-by #(distance world ent %))))

@@ -23,6 +23,10 @@
   [world pt]
   (not-empty (at world pt)))
 
+(defn adj-at
+  [world pt]
+  (mapcat #(at world %) (adj pt)))
+
 (defn pred-at?
   [world pred pt]
   (boolean (some #(pred world %) (at world pt))))
@@ -90,6 +94,19 @@
   (if-let [p (pos world ent)]
     (adj? p pt)
     false))
+
+(defn adj-to
+  [world ent]
+  (adj-at world (pos world ent)))
+
+(defn distance
+  "Calculate the manhattan distance
+   between entity `a` and `b`"
+  [em entity-a entity-b]
+  (let [a (pos em entity-a)
+        b (pos em entity-b)]
+    (or (and a b (manhattan-dist a b))
+        Integer/MAX_VALUE)))
 
 (defn unput
   [world ent]

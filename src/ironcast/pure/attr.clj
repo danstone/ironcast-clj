@@ -110,6 +110,14 @@
   [world ent]
   (has-flag? world ent :decor))
 
+(defn creature?
+  [world ent]
+  (has-flag? world ent :creature))
+
+(defn creatures
+  [world]
+  (-> world :with-flag :creature))
+
 (defn player?
   [world ent]
   (has-flag? world ent :player))
@@ -180,9 +188,19 @@
       (= (enemy? world ent)
          (enemy? world other))))
 
+
+(defn allies-of
+  [world ent]
+  (filter #(and (not= % ent) (ally-of? world ent %)) (creatures world)))
+
 (defn enemy-of?
   [world ent other]
-  (not (ally-of? world ent other)))
+  (and (creature? world other)
+       (not (ally-of? world ent other))))
+
+(defn enemies-of
+  [world ent]
+  (filter #(and (not= % ent) (enemy-of? world ent %)) (creatures world)))
 
 (defn ai?
   [world ent]

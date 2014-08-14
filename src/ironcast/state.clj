@@ -54,6 +54,7 @@
 (defonce input (atom {}))
 (defonce commands (atom #{}))
 (defonce ui (atom {}))
+(defonce ai-state (atom {}))
 (defonce ai-loops (atom {}))
 (defonce ent-shift (atom {}))
 (defonce settings (atom default))

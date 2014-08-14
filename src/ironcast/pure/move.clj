@@ -1,12 +1,12 @@
 (ns ironcast.pure.move
   (:require [ironcast.pure
              [pos :refer :all]
-             [attr :refer :all]]
+             [attr :refer :all]
+             [time :as time]
+             [vis :as vis]]
             [ironcast.util :refer :all]
             [clj-tiny-astar.path :refer [a*]]
-            [clj-tuple :refer [tuple]]
-            [ironcast.pure.vis :as vis]
-            [ironcast.pure.time :as time]))
+            [clj-tuple :refer [tuple]]))
 
 
 (defn move
@@ -123,6 +123,16 @@
     (rest (a* (bounds world) #(or (walkable? world %)
                                   (= from %)) from to))))
 
+(defn find-path-to-adjacent
+  "Find a path to a cell adj to `b` from `a`"
+  [world a b]
+  (let [adj (sort-by #(manhattan-dist a %) (adj b))]
+    (loop [adj adj]
+      (if-let [p (first adj)]
+        (if-let [path (and (not-solid? world p) (seq (find-path world not-solid? a p)))]
+          path
+          (recur (rest adj)))))))
+
 (defn find-player-path
   [world from to]
   (when (player-walkable? world to)
@@ -134,6 +144,7 @@
   (if (player? world ent)
     (find-player-path world (pos world ent) to)
     (find-path world (pos world ent) to)))
+
 
 (defn make-path
   [world ent]

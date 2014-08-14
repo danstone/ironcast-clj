@@ -90,7 +90,7 @@
 
 (defmethod descr :magic-missiles
   [world caster pt spell]
-  [[:light-yellow (str "Magic Missiles (" (:cost spell "???") "AP)")]
+  [[:light-yellow (str "Magic Missiles (" (:cost spell "???") " AP)")]
    "- Fires several missiles in area of effect"
    "- One missile per cell in area"
    "- Area of effect increases with experience"
