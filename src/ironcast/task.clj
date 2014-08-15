@@ -74,11 +74,16 @@
 
 (defn do-ai
   [ent]
-  (let [world @state/world]
-    (swap! state/ai-state assoc ent (ai/observe world ent))
-    (when (and (not (ai/done? world ent))
-               (not (time/player? world)))
-      (api/update-world ai/done ent))))
+  (when-not @api/player?
+    (let [world @state/world
+          observed (ai/observe world ent)]
+      (swap! state/ai-state assoc ent observed)
+      (when-let [act (ai/decide world ent observed)]
+        (println "Action: " act)
+        (api/do-act act))
+      (when (and (not (ai/done? world ent))
+                 (not (time/player? world)))
+        (api/update-world ai/done ent)))))
 
 (defn ai-loop
   [ent]

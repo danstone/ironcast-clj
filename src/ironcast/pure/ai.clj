@@ -23,6 +23,20 @@
   (let [all (ai world)]
     (set/superset? (:done world) all)))
 
+(def done-action
+  {:type :done})
+
+(defmethod act/could? :done
+  [world ent _ _]
+  true)
+
+(defmethod act/prepare :done
+  [_ ent _ action]
+  (assoc action :ent ent))
+
+(defmethod act/try-perform :done
+  [world {:keys [ent]}]
+  (success (done world ent)))
 
 (defn look
   [world ent]
@@ -41,17 +55,6 @@
                (pos world target))]
     (/ 1 dist)))
 
-
-
-(defn pathable-adj-targets
-  [world ent targets]
-  (lazy-seq
-    (when-let [target (first targets)]
-      (if-let [path (find-path-to-adj-ent world ent target)]
-        (cons (tuple target path) (pathable-adj-targets world ent (rest targets)))
-        (pathable-adj-targets world ent (rest targets))))))
-
-
 (defn find-adj
   [state world ent]
   (let [all (adj-to world ent)]
@@ -65,6 +68,14 @@
   [state world ent]
   (let [enemies (:enemies state)]
     (assoc state :attack (sort-by #(attack-priority world ent %) enemies))))
+
+(defn pathable-adj-targets
+  [world ent targets]
+  (lazy-seq
+    (when-let [target (first targets)]
+      (if-let [path (find-path-to-adj-ent world ent target)]
+        (cons (tuple target (last path)) (pathable-adj-targets world ent (rest targets)))
+        (pathable-adj-targets world ent (rest targets))))))
 
 (defn find-pathable-attack-targets
   [state world ent]
@@ -80,10 +91,30 @@
 
 (defn observe
   [world ent]
-  (if (and ent
-           (or (time/real? world)
-               (not (time/enemy? world))))
+  (if (and world ent)
     (observe* world ent)))
 
+(defn mattack-adj
+  [world ent observed]
+  (when-let [adj-enemies (:adj-enemies observed)]
+    (when-let [target (first adj-enemies)]
+      (act/prepare world ent (pos world target) act/attack-action))))
 
+(defn mattack
+  [world ent observed]
+  (when-let [pathable (:pathable-attack observed)]
+    (let [[_ pt] (first pathable)]
+      (act/prepare world ent pt act/move-action))))
+
+(defn mdone
+  [world ent observed]
+  (act/prepare world ent nil done-action))
+
+(defn decide
+  [world ent observed]
+  (-> (for [f [mattack-adj mattack mdone]
+             :let [action (f world ent observed)]
+             :when action]
+         action)
+       first))
 

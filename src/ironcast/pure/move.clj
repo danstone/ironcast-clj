@@ -129,7 +129,7 @@
   (let [adj (sort-by #(manhattan-dist a %) (adj b))]
     (loop [adj adj]
       (if-let [p (first adj)]
-        (if-let [path (and (not-solid? world p) (seq (find-path world not-solid? a p)))]
+        (if-let [path (and (not-solid? world p) (seq (find-path world a p)))]
           path
           (recur (rest adj)))))))
 

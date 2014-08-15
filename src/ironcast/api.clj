@@ -470,9 +470,13 @@
                     @world-cell
                     act))))
 
+(defn do-act
+  [action]
+  (event/put-act! action))
+
 (defn act
   [action ent pt]
-  (event/put-act! (act/prepare @world ent pt action)))
+  (do-act (act/prepare @world ent pt action)))
 
 (defn act-at-mouse
   ([action]
