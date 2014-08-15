@@ -78,12 +78,11 @@
   (when-not (or @api/player? @api/real?)
     (let [world @state/world
           observed (ai/observe world ent)]
+      ;;todo do actually care about keeping the observations around?
+      ;;presumably we will assoc more state as ai gets more sophisticated?
       (swap! state/ai-state assoc ent observed)
       (when-let [act (ai/decide world ent observed)]
-        (api/do-act act))
-      (when (and (not (ai/done? world ent))
-                 (not (time/player? world)))
-        (api/update-world ai/done ent)))))
+        (api/do-act act)))))
 
 (defn ai-loop
   [ent]

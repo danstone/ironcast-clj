@@ -174,7 +174,8 @@
 (def attack-action
   {:type :attack
    :mouse-sprite :mouse-attack
-   :mouse-sprite-grey :mouse-attack-grey})
+   :mouse-sprite-grey :mouse-attack-grey
+   :cost 2})
 
 (defn can-attack?
   [world ent pt]

@@ -74,7 +74,7 @@
   (lazy-seq
     (when-let [target (first targets)]
       (if-let [path (find-path-to-adj-ent world ent target)]
-        (cons (tuple target (last path)) (pathable-adj-targets world ent (rest targets)))
+        (cons (tuple target path) (pathable-adj-targets world ent (rest targets)))
         (pathable-adj-targets world ent (rest targets))))))
 
 (defn find-pathable-attack-targets
@@ -94,25 +94,37 @@
   (if (and world ent)
     (observe* world ent)))
 
+
 (defn mattack-adj
   [world ent observed]
   (when-let [adj-enemies (:adj-enemies observed)]
-    (when-let [target (first adj-enemies)]
-      (act/prepare world ent (pos world target) act/attack-action))))
+    (let [target (first adj-enemies)
+          pt (pos world target)]
+      (when (and target (act/can? world ent pt act/attack-action))
+        (act/prepare world ent pt act/attack-action)))))
 
 (defn mattack
   [world ent observed]
   (when-let [pathable (:pathable-attack observed)]
-    (let [[_ pt] (first pathable)]
-      (act/prepare world ent pt act/move-action))))
+    (let [[_ path] (first pathable)
+          pt (last path)]
+      (when (and pt (act/can? world ent pt act/move-action)
+                 (<=  (cost pt (first path)) (current-ap world ent)))
+        (act/prepare world ent pt act/move-action)))))
+
 
 (defn mdone
   [world ent observed]
   (act/prepare world ent nil done-action))
 
+(defn mspent
+  [world ent observed]
+  (when (= 0 (current-ap world ent))
+    (mdone world ent observed)))
+
 (defn decide
   [world ent observed]
-  (-> (for [f [mattack-adj mattack mdone]
+  (-> (for [f [mspent mattack-adj mattack mdone]
              :let [action (f world ent observed)]
              :when action]
          action)
