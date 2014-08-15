@@ -459,7 +459,10 @@
    (run-setters source setter-map (conj (partition 2 opts) [key val]))))
 
 (defn setter-ctor
-  "Takes a constructor function and a setter-map
+  "Takes a constructor function and a setter-map, an return a new
+   constructor function that takes named args, each the corresponding setter
+   from the setter map will be invoked on the new instance created by the constructor.
+   Useful for creating friendly constructors for java beans.
    e.g. (def create-some-obj (setter-ctor #(SomeObj.) {:foo .setFoo}))
         (create-some-obj :foo 1)
         =>  an instance of SomeObj with the foo property set to 1."
