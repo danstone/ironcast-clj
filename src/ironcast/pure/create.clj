@@ -109,9 +109,10 @@
   (try-create-many world #(try-create %1 try-fn db %2) tiled-coll))
 
 (defn try-create-world
-  [db tiled-map]
+  [db seed tiled-map]
   (try-state [world {:width (:width tiled-map)
-                     :height (:height tiled-map)}]
+                     :height (:height tiled-map)
+                     :seed (long seed)}]
              (try-create-tiled world db tiled-terrain (:terrain tiled-map))
              (try-create-tiled world db tiled-decor (:decor tiled-map))))
 

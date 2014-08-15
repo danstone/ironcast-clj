@@ -531,10 +531,15 @@
               :name "Goblin")))
 
 
+(defn seed
+  []
+  (long (rand Long/MAX_VALUE)))
+
 (defn test-world
   []
   (let [[new-world success?] (try-create-world
                                @db
+                               (seed)
                                (find-map :test))]
     (if success?
       (do (dosync (ref-set world

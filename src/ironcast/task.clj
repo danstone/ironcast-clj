@@ -74,12 +74,12 @@
 
 (defn do-ai
   [ent]
-  (when-not @api/player?
+  ;;todo will we want ai to operate when in real mode?
+  (when-not (or @api/player? @api/real?)
     (let [world @state/world
           observed (ai/observe world ent)]
       (swap! state/ai-state assoc ent observed)
       (when-let [act (ai/decide world ent observed)]
-        (println "Action: " act)
         (api/do-act act))
       (when (and (not (ai/done? world ent))
                  (not (time/player? world)))
