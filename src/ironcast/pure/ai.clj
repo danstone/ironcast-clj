@@ -42,19 +42,12 @@
     (/ 1 dist)))
 
 
-(defn path-to-adj
-  [world ent target]
-  (-> (find-path-to-adjacent world
-                             (pos world ent)
-                             (pos world target))
-      seq))
-
 
 (defn pathable-adj-targets
   [world ent targets]
   (lazy-seq
     (when-let [target (first targets)]
-      (if-let [path (path-to-adj world ent target)]
+      (if-let [path (find-path-to-adj-ent world ent target)]
         (cons (tuple target path) (pathable-adj-targets world ent (rest targets)))
         (pathable-adj-targets world ent (rest targets))))))
 

@@ -123,7 +123,7 @@
     (rest (a* (bounds world) #(or (walkable? world %)
                                   (= from %)) from to))))
 
-(defn find-path-to-adjacent
+(defn find-path-to-adj
   "Find a path to a cell adj to `b` from `a`"
   [world a b]
   (let [adj (sort-by #(manhattan-dist a %) (adj b))]
@@ -132,6 +132,13 @@
         (if-let [path (and (not-solid? world p) (seq (find-path world not-solid? a p)))]
           path
           (recur (rest adj)))))))
+
+(defn find-path-to-adj-ent
+  [world ent target-ent]
+  (let [a (pos world ent)
+        b (pos world target-ent)]
+    (when (and a b)
+      (seq (find-path-to-adj world a b)))))
 
 (defn find-player-path
   [world from to]
