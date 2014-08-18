@@ -221,15 +221,6 @@
 (def basic-compiled
   (compile-tree basic))
 
-(defn mdone
-  [world ent observed]
-  (act/prepare world ent nil done-action))
-
-(defn mspent
-  [world ent observed]
-  (when (= 0 (current-ap world ent))
-    (mdone world ent observed)))
-
 (defn decide
   [world ent]
   (:actions (act basic-compiled world ent {})))
