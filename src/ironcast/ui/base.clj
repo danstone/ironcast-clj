@@ -122,12 +122,13 @@
 
 (defn draw-path!
   []
-  (when-let [path @api/ui-path]
-    (let [height (:height @state/world)]
-      (doseq [[[x y] sprite] path
-              :let [x (* x 32)
-                    y (* (- height y 1) 32)]]
-        (gfx/draw-sprite! (api/sprite sprite) x y)))))
+  (when-not @api/casting
+    (when-let [path @api/ui-path]
+      (let [height (:height @state/world)]
+        (doseq [[[x y] sprite] path
+                :let [x (* x 32)
+                      y (* (- height y 1) 32)]]
+          (gfx/draw-sprite! (api/sprite sprite) x y))))))
 
 (defn draw-button
   [sprite x y w h]
