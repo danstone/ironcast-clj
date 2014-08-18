@@ -38,36 +38,12 @@
   [world {:keys [ent]}]
   (success (done world ent)))
 
-(defn look
-  [world ent]
-  (let [enemies  (visible-by-sorted world ent (enemies-of world ent))
-        allies  (visible-by-sorted world ent (allies-of world ent))]
-    {:ent ent
-     :enemies enemies
-     :allies allies
-     :nearest-ally (first allies)
-     :nearest-enemy (first enemies)}))
-
 (defn attack-priority
   [world ent target]
   (let [dist (manhattan-dist
                (pos world ent)
                (pos world target))]
     (/ 1 dist)))
-
-(defn find-adj
-  [state world ent]
-  (let [all (adj-to world ent)]
-    (assoc state
-      :adj-enemies (sort-by #(attack-priority world ent %)
-                            (filter #(enemy-of? world ent %) all))
-      :adj-allies (filter #(ally-of? world ent %) all))))
-
-
-(defn find-attack-targets
-  [state world ent]
-  (let [enemies (:enemies state)]
-    (assoc state :attack (sort-by #(attack-priority world ent %) enemies))))
 
 (defn pathable-adj-targets
   [world ent targets]
@@ -77,44 +53,173 @@
         (cons (tuple target path) (pathable-adj-targets world ent (rest targets)))
         (pathable-adj-targets world ent (rest targets))))))
 
-(defn find-pathable-attack-targets
-  [state world ent]
-  (assoc state
-    :pathable-attack (pathable-adj-targets world ent (:attack state))))
 
-(defn observe*
-  [world ent]
-  (-> (look world ent)
-      (find-adj world ent)
-      (find-attack-targets world ent)
-      (find-pathable-attack-targets world ent)))
+(defprotocol Behaviour
+  (act [this world ent context]))
 
-(defn observe
-  [world ent]
-  (if (and world ent)
-    (observe* world ent)))
+(defrecord Sequence [behaviours]
+  Behaviour
+  (act [this world ent context]
+    (let [f (fn [st b]
+              (if (= (:status st) :success)
+                (let [result (act b world ent (:context st))]
+                  (case (:status result)
+                    :success (-> st
+                                 (update :context merge (:context result))
+                                 (update :actions concat (:actions result)))
+                    (->
+                      st
+                      (update :context merge (:context result))
+                      (assoc :status :failed))))
+                st))]
+      (reduce f {:status :success
+                 :context context} (:behaviours this)))))
 
+(defrecord Selector [behaviours]
+  Behaviour
+  (act [this world ent context]
+    (let [f (fn [st b]
+              (if (not= (:status st) :success)
+                (let [result (act b world ent (:context st))]
+                  (case (:status result)
+                    :success (-> st
+                                 (update :context merge (:context result))
+                                 (update :actions concat (:actions result))
+                                 (assoc :status :success))
+                    (-> st
+                        (update :context merge (:context result)))))
+                st))]
+      (reduce f {:status :failed
+                 :context context} (:behaviours this)))))
 
-(defn mattack-adj
-  [world ent observed]
-  (when-let [adj-enemies (:adj-enemies observed)]
-    (let [target (first adj-enemies)
-          pt (pos world target)]
-      (when (and target (act/can? world ent pt act/attack-action))
-        (act/prepare world ent pt act/attack-action)))))
+(defmacro finder
+  [kw context form]
+  `(if (~kw ~context)
+     {:status :success}
+     (let [found# ~form]
+       (when found#
+         {:status :success
+          :context {~kw found#}}))))
 
-(defn mattack
-  [world ent observed]
-  (when-not (seq (:adj-enemies observed))
-    (when-let [pathable (:pathable-attack observed)]
-      (let [[_ path] (first pathable)
+(def bfind-adj
+  (reify Behaviour
+    (act [this world ent context]
+      (finder :adj context
+              (seq (adj-to world ent))))))
+
+(def bfind-adj-enemies*
+  (reify Behaviour
+    (act [this world ent context]
+      (finder :adj-enemies context
+              (seq (filter #(enemy-of? world ent %) (:adj context)))))))
+
+(def bfind-adj-enemy*
+  (reify Behaviour
+    (act [this world ent context]
+      (finder :adj-enemy context
+              (first (:adj-enemies context))))))
+
+(def battack-adj*
+  (reify Behaviour
+    (act [this world ent context]
+      (let [enemy (:adj-enemy context)
+            pt (pos world enemy)]
+        (when (and enemy pt (act/can? world ent pt act/attack-action))
+          {:status :success
+           :actions [(act/prepare world ent pt act/attack-action)]})))))
+
+(def bfind-enemies
+  (reify Behaviour
+    (act [this world ent context]
+      (finder :enemies context
+              (seq (visible-by-sorted world ent (enemies-of world ent)))))))
+
+(def bfind-attack-targets*
+  (reify Behaviour
+    (act [this world ent context]
+      (finder :attack-targets context
+              (seq (sort-by #(attack-priority world ent %) (:enemies context)))))))
+
+(def bfind-pathable-attack-targets*
+  (reify Behaviour
+    (act [this world ent context]
+      (finder :pathable-attack-targets context
+              (seq (pathable-adj-targets world ent (:attack-targets context)))))))
+
+(def bfind-pathable-attack-target*
+  (reify Behaviour
+    (act [this world ent context]
+      (finder :pathable-attack-target context
+              (first (:pathable-attack-targets context))))))
+
+(def battack*
+  (reify Behaviour
+    (act [this world ent context]
+      (let [[_ path] (:pathable-attack-target context)
             pt (last path)]
         (when (and pt
-                   path
-                   (act/can? world ent pt act/move-action)
-                   (<= (cost (pos world ent) (first path)) (current-ap world ent)))
-          (act/prepare world ent pt act/move-action))))))
+                 path
+                 (act/can? world ent pt act/move-action)
+                 (<= (cost (pos world ent) (first path)) (current-ap world ent)))
+          {:status :success
+           :actions [(act/prepare world ent pt act/move-action)]})))))
 
+(def bspent
+  (reify Behaviour
+    (act [this world ent context]
+      (when (= 0 (current-ap world ent))
+        {:status :success
+         :actions [(act/prepare world ent nil done-action)]}))))
+
+(def bdone
+  (reify Behaviour
+    (act [this world ent context]
+      {:status :success
+       :actions [(act/prepare world ent nil done-action)]})))
+
+(def bfind-attack-targets
+  [bfind-enemies bfind-attack-targets*])
+
+(def bfind-pathable-attack-targets
+  [bfind-attack-targets bfind-pathable-attack-targets*])
+
+(def bfind-pathable-attack-target
+  [bfind-pathable-attack-targets bfind-pathable-attack-target*])
+
+(def bfind-adj-enemies
+  [bfind-adj bfind-adj-enemies*])
+
+(def bfind-adj-enemy
+  [bfind-adj-enemies bfind-adj-enemy*])
+
+(def battack-adj
+  [bfind-adj-enemy battack-adj*])
+
+(def battack
+  [bfind-pathable-attack-target battack*])
+
+(def bstay-adj
+  [bfind-adj-enemy bdone])
+
+(def basic
+  [:select
+       bspent
+       battack-adj
+       bstay-adj
+       battack
+       bdone])
+
+(defn compile-tree
+  [behaviour]
+  (cond
+    (and (vector? behaviour) (= (first behaviour) :select))
+    (->Selector (map compile-tree (drop 1 behaviour)))
+    (vector? behaviour)
+    (->Sequence (map compile-tree behaviour))
+    :else behaviour))
+
+(def basic-compiled
+  (compile-tree basic))
 
 (defn mdone
   [world ent observed]
@@ -126,10 +231,6 @@
     (mdone world ent observed)))
 
 (defn decide
-  [world ent observed]
-  (-> (for [f [mspent mattack-adj mattack mdone]
-             :let [action (f world ent observed)]
-             :when action]
-         action)
-       first))
+  [world ent]
+  (:actions (act basic-compiled world ent {})))
 

@@ -25,7 +25,8 @@
 
 (defn adj-at
   [world pt]
-  (mapcat #(at world %) (adj pt)))
+  (when pt
+    (mapcat #(at world %) (adj pt))))
 
 (defn pred-at?
   [world pred pt]
@@ -100,6 +101,7 @@
     false))
 
 (defn adj-to
+  "Find the entities adj to `ent`"
   [world ent]
   (adj-at world (pos world ent)))
 

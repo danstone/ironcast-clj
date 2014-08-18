@@ -76,12 +76,10 @@
   [ent]
   ;;todo will we want ai to operate when in real mode?
   (when-not (or @api/player? @api/real?)
-    (let [world @state/world
-          observed (ai/observe world ent)]
+    (let [world @state/world]
       ;;todo do actually care about keeping the observations around?
       ;;presumably we will assoc more state as ai gets more sophisticated?
-      (swap! state/ai-state assoc ent observed)
-      (when-let [act (ai/decide world ent observed)]
+      (doseq [act (ai/decide world ent)]
         (api/do-act act)))))
 
 (defn ai-loop
