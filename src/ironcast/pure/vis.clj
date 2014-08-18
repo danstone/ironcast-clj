@@ -35,7 +35,7 @@
 
 (defn los?
   [world a b]
-  (los*? b (los world a b)))
+  (los*? world b (los world a b)))
 
 (defn player-visibility
   ([world]
