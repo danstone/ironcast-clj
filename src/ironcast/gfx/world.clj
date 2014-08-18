@@ -24,11 +24,10 @@
                     [_ x2 y2] (get shift e)
                     x (+ (* x 32) (or x2 0))
                     y (- (* (- h y 1) 32) (or y2 0))]]
-        (with-color
-          (if (visible? world pos)
-            :white
-            :grey)
-          (drawfn x y e))))))
+        (cond
+          (visible? world pos) (with-color :white (drawfn x y e))
+          (creature? world e) nil
+          :else (with-color :grey (drawfn x y e)))))))
 
 (defn draw-by-flag
   "Draw all entities with `flag` via draw-seq"
