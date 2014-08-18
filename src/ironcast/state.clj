@@ -17,6 +17,7 @@
    :cancel (press :esc)
    :info (press :right)
    :turn (press :space)
+   :los (hold :lshift)
    :player-1 (press :f1)
    :player-2 (press :f2)
    :player-3 (press :f3)

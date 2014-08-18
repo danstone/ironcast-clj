@@ -105,12 +105,15 @@
 
 (defn mattack
   [world ent observed]
-  (when-let [pathable (:pathable-attack observed)]
-    (let [[_ path] (first pathable)
-          pt (last path)]
-      (when (and pt (act/can? world ent pt act/move-action)
-                 (<=  (cost pt (first path)) (current-ap world ent)))
-        (act/prepare world ent pt act/move-action)))))
+  (when-not (seq (:adj-enemies observed))
+    (when-let [pathable (:pathable-attack observed)]
+      (let [[_ path] (first pathable)
+            pt (last path)]
+        (when (and pt
+                   path
+                   (act/can? world ent pt act/move-action)
+                   (<= (cost (pos world ent) (first path)) (current-ap world ent)))
+          (act/prepare world ent pt act/move-action))))))
 
 
 (defn mdone

@@ -3,7 +3,9 @@
             [ironcast.util :refer :all]
             [clj-tuple :refer [tuple]]
             [ironcast.pure.act :as act]
-            [ironcast.pure.spell :as spell]))
+            [ironcast.pure.spell :as spell]
+            [ironcast.pure.vis :as vis]
+            [ironcast.state :as state]))
 
 
 (defn handle-cam
@@ -93,6 +95,15 @@
           (api/act a ent mc))
         first))
   nil)
+
+(defn handle-los
+  [handled comms]
+  (if (comms :los)
+    (let [a (api/pos (first @api/selected))
+          b @api/world-cell]
+      (when (and a b)
+        (swap! state/ui assoc :los (seq (vis/player-los @state/world a b)))))
+    (swap! state/ui dissoc :los)))
 
 
 (defn handle-cast
@@ -192,6 +203,9 @@
             only-in-game
             only-realtime-or-player
             not-when-casting)
+
+        (-> handle-los
+            only-realtime-or-player)
 
         (-> handle-cast
             only-realtime-or-player)

@@ -18,29 +18,39 @@
   (assoc world :visible visibility
                :explored (set/union (:explored world #{}) visibility)))
 
-(defn los? [world a b]
-  (-> (take-while #(transparent-at? world %)
-                  (line a b))
-      last
-      (= b)))
+(defn los
+  [world a b]
+  (take-while #(transparent-at? world %)
+              (line a b)))
+
+(defn player-los
+  [world a b]
+  (take-while #(explored? world %) (los world a b)))
+
+(defn- los*?
+  [world b los]
+  (if (transparent-at? world b)
+    (= (last los) b)
+    (adj? (last los) b)))
+
+(defn los?
+  [world a b]
+  (los*? b (los world a b)))
 
 (defn player-visibility
   ([world]
    (player-visibility world 5))
   ([world range]
-    (let [transparent-at? #(transparent-at? world %)]
-      (->> (for [pl (players world)
-                 :let [a (pos world pl)]
-                 :when a
-                 opaque (-> world :with-flag :opaque)
-                 :let [b (pos world opaque)]
-                 :when b
-                 p (cons b
-                         (take-while transparent-at?
-                                     (line a b)))
-                 :when (<= (manhattan-dist a p) range)]
-             p)
-           (into #{})))))
+   (->> (for [pl (players world)
+              :let [[x y :as a] (pos world pl)]
+              :when a
+              :let [circle (filled-circle x y range)]
+              b circle
+              :let [l (los world a b)]
+              :when (los*? world b l)
+              p (cons b l)]
+          p)
+        (into #{}))))
 
 (defn visible-from
   "Find the sequence of entities visible from `pt`"

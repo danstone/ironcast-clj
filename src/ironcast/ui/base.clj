@@ -73,6 +73,16 @@
         :green
         (gfx/draw-border! @api/blank lasso 1)))))
 
+(defn draw-los!
+  []
+  (when (or @api/player? @api/real?)
+    (when-let [los (:los @state/ui)]
+      (let [height @api/world-height
+            spr (api/sprite :ministar)]
+        (doseq [[wx wy :as pt] los
+                :let [x (* wx 32)
+                      y (* (- height wy 1) 32)]]
+          (gfx/draw-sprite! spr (+ x 12) (- y 12)))))))
 
 (defn draw-aoe!
   []

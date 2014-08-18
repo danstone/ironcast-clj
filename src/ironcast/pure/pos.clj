@@ -47,6 +47,10 @@
   [world pt]
   (not (opaque-at? world pt)))
 
+(defn creature-at
+  [world pt]
+  (first (filter #(creature? world %) (at world pt))))
+
 (defn enemies-of-at
   [world ent pt]
   (filter #(enemy-of? world ent %) (at world pt)))

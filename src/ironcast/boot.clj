@@ -12,5 +12,5 @@
   (api/set-setting :max-fps 0))
 
 
-(go-slow)
+(go-fast)
 (go)

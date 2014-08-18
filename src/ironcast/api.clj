@@ -343,6 +343,14 @@
   [ent]
   (pos/pos @world ent))
 
+(defn at
+  [pt]
+  (pos/at @world pt))
+
+(defn creature-at
+  [pt]
+  (pos/creature-at @world pt))
+
 (defn jump-to-entity
   [ent]
   (let [[x y :as p] (pos ent)]
@@ -556,3 +564,7 @@
                   :name "Wooden Door")
           "success")
       "failed")))
+
+(defn blat-world
+  []
+  (update-world (constantly nil)))
