@@ -100,8 +100,10 @@
             :when (not (get ai e))]
       (swap! state/ai-loops
              assoc e (let [l (ai-loop e)]
-                       (println "Starting ai-loop" e)
-                       (start l)
+                       (go
+                         (<! (timeout (mod (hash e) 1000)))
+                         (println "Starting ai-loop" e)
+                         (start l))
                        l)))))
 
 (defn ai-rems
