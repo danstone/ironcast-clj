@@ -3,7 +3,8 @@
             [ironcast.internals.gfx :as gfx]
             [ironcast.api :as api]
             [ironcast.state :as state]
-            [ironcast.pure.attr :as attr]))
+            [ironcast.pure.attr :as attr]
+            [ironcast.gfx.world :as wgfx]))
 
 (defmulti draw-info (fn [[type _] x y w h] type))
 
@@ -27,8 +28,7 @@
         attrs (attr/all world ent)]
     (when ent
       (draw-text! (:name attrs "???") (+ x 32) (- y 32))
-      (when-let [spr (:sprite attrs)]
-        (gfx/draw-sprite! spr (+ x 32) (- y 64 64) 64 64))
+      (wgfx/draw-creature world ent (+ x 32) (- y 128) 64 64)
       (draw-text-wrapped! (:descr attrs "???") (+ x 32)
                           (- y 160) 256)
       (draw-stats world ent (+ x 128) (- y 32)))))
