@@ -55,17 +55,17 @@
                       (- (* 32 height) y 32))))))
 
 (defn draw-creature
-  [world x y ent]
+  [world ent x y w h]
   (let [base (attr world ent :sprite)
         equip (attr world ent :equip)
         equip-sprites (keep #(attr world % :equip-sprite) equip)]
     (doseq [sprite (cons base equip-sprites)]
-      (draw-sprite! (api/sprite sprite) x y 32 32))))
+      (draw-sprite! (api/sprite sprite) x y w h))))
 
 (defn draw-creatures
   [world]
   (draw-seq world
-            (partial draw-creature world)
+            #(draw-creature world %3 %1 %2 32 32)
             (creatures world)))
 
 (defn draw-world
