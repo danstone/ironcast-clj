@@ -9,13 +9,13 @@
             [ironcast.state :as state]))
 
 (defn draw-backing
-  [x y w h player]
+  [player x y w h]
   (if (api/selected? player)
     (gfx/draw-backed-box! @api/blank x y w h :green)
     (draw-hover-border! x y w h)))
 
 (defn draw-stats
-  [x y player]
+  [player x y]
   (let [world @state/world]
     (let [[hp max-hp] (attr/hp world player)
           [ap max-ap] (attr/ap world player)
@@ -29,7 +29,7 @@
   [x y player]
   (when player
     (let [w 128 h 160]
-      (draw-backing x y w h player))
+      (draw-backing player x y w h))
     (let [sprite (api/attr player :sprite)
           name (str (api/attr player :name "???") " " player)]
       (when (and sprite name)
@@ -37,7 +37,7 @@
                         (+ x 3)
                         (- y 3))
         (wgfx/draw-creature @state/world player (+ x 16) (- y 96) 64 64)
-        (draw-stats x y player)))))
+        (draw-stats player x y)))))
 
 (defn draw-players
   []
