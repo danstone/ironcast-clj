@@ -9,7 +9,6 @@
             [ironcast.pure.act :as act]
             [ironcast.pure.time :as time]
             [ironcast.pure.spell :as spell]
-            [ironcast.pure.item :as item]
             [ironcast.io :as io]
             [ironcast.db :as db]
             [ironcast.tiled :as tiled]
@@ -599,7 +598,6 @@
   [n pt]
   (doseq [pt (take n (flood pt not-solid?))]
     (goblin pt)))
-
 
 (defn seed
   []
