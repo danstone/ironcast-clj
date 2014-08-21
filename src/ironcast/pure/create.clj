@@ -55,6 +55,18 @@
         attrs)
       (try-put ent pt)))
 
+(defn item
+  [world ent flags & {:as attrs}]
+  (-> (apply add-flag
+             world
+             ent
+             :item
+             flags)
+      (add-attrs
+        ent
+        attrs)
+      success))
+
 (defn base-door
   [world ent attrs]
   (-> world
@@ -73,7 +85,7 @@
   [world try-f & args]
   (let [[nw-a id] (next-id world)]
     (let [[nw-b success?] (apply try-f nw-a id args)]
-      (if success? [nw-b true]
+      (if success? [nw-b id]
                    [world false]))))
 
 (defn try-create-many

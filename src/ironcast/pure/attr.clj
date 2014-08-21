@@ -242,6 +242,13 @@
       (add-attr ent
         :sprite (attr world ent :closed-sprite))))
 
+(defn unequip
+  [world ent item]
+  (update-attr world ent disj item))
+
+(defn equip
+  [world ent item]
+  (update-attr world ent :equip set-conj item))
 
 (def default-hp (tuple 10 10))
 
@@ -329,6 +336,7 @@
 (defn add-fatigue
   [world ent amount]
   (update-attr world ent :fatigue #(+ (or % 0) amount)))
+
 
 (defn path-sprite
   [world ent total]

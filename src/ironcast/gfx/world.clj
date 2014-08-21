@@ -54,6 +54,20 @@
                       x
                       (- (* 32 height) y 32))))))
 
+(defn draw-creature
+  [world x y ent]
+  (let [base (attr world ent :sprite)
+        equip (attr world ent :equip)
+        equip-sprites (keep #(attr world % :equip-sprite) equip)]
+    (doseq [sprite (cons base equip-sprites)]
+      (draw-sprite! (api/sprite sprite) x y 32 32))))
+
+(defn draw-creatures
+  [world]
+  (draw-seq world
+            (partial draw-creature world)
+            (creatures world)))
+
 (defn draw-world
   "Draws the world!"
   [world]
@@ -62,6 +76,6 @@
   (draw-by-flag world :decor)
   (draw-circles world :enemy :red)
   (draw-circles world :selected :green)
-  (draw-by-flag world :creature)
+  (draw-creatures world)
   (draw-missiles world))
 

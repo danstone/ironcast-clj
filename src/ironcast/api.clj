@@ -9,6 +9,7 @@
             [ironcast.pure.act :as act]
             [ironcast.pure.time :as time]
             [ironcast.pure.spell :as spell]
+            [ironcast.pure.item :as item]
             [ironcast.io :as io]
             [ironcast.db :as db]
             [ironcast.tiled :as tiled]
@@ -56,7 +57,9 @@
 (defn sprite
   "Finds a sprite in the db - returning it if found"
   [key]
-  (db/find-sprite @db key))
+  (if (keyword? key)
+    (db/find-sprite @db key)
+    key))
 
 (defn find-map
   [key]
@@ -356,11 +359,22 @@
 
 (defn create
   [try-f & args]
-  (apply update-world create/create try-f args))
+  (dosync
+    (let [w @world
+          [new-w id] (apply create/try-create w try-f args)]
+      (ref-set world new-w)
+      id)))
 
 (defn creature
   [pt & opts]
   (apply create create/creature pt opts))
+
+(defn item
+  [flags & attrs]
+  (apply create create/item flags attrs))
+
+(def items
+  (>> (-> @world :with-flag :item)))
 
 (defn pos
   [ent]
@@ -553,22 +567,38 @@
 
 (def dwarves ["Sleepy" "Bashful" "Grumpy" "Dopey" "Doc" "Sneezy"])
 
+(defn dwarf
+  [name pt]
+  (creature pt #{:player}
+            :sprite (sprite :dwarf-male)
+            :name name
+            :descr "A Dwarf"))
+
+(defn leather-armour
+  []
+  (item #{:torso}
+        :sprite :leather-armour
+        :equip-sprite :leather-armour-equip))
+
 (defn dwarfs
   "Creates a test party"
   [pt]
   (doseq [[name pt] (map tuple dwarves (flood pt not-solid?))]
-    (creature pt #{:player}
-              :sprite (sprite :dwarf-male)
-              :name name
-              :descr "A Dwarf")))
+    (let [ent (dwarf name pt)
+          item (leather-armour)]
+      (update-world attr/equip ent item))))
+
+(defn goblin
+  [pt]
+  (creature pt #{:enemy :ai}
+            :sprite (sprite :goblin-slave)
+            :name "Goblin"
+            :descr "A goblin"))
 
 (defn goblins
   [n pt]
   (doseq [pt (take n (flood pt not-solid?))]
-    (creature pt #{:enemy :ai}
-              :sprite (sprite :goblin-slave)
-              :name "Goblin"
-              :descr "A goblin")))
+    (goblin pt)))
 
 
 (defn seed

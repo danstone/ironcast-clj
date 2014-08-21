@@ -102,4 +102,13 @@
    :pyromancy 160 64 32 32
    :black-magic 192 64 32 32
    :psionics 224 64 32 32
-   :mechanisms 0 96 32 32]}
+   :mechanisms 0 96 32 32]
+ "Armour"
+  [:leather-armour 0 0 32 32
+   :leather-armour-equip 32 0 32 32
+   :studded-leather-armour 0 32 32 32
+   :studded-leather-armour-equip 32 32 32 32
+   :scale-armour 0 64 32 32
+   :scale-armour-equip 32 64 32 32
+   :splint-armour 0 96 32 32
+   :splint-armour-equip 32 96 32 32]}
