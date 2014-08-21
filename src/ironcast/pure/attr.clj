@@ -35,6 +35,10 @@
   (let [ents (-> world :with-flag (get flag))]
     (reduce #(rem-flag %1 %2 flag) world ents)))
 
+(defn all-flags
+  [world ent]
+  (-> world :flags (get ent)))
+
 (defn all
   [world ent]
   (-> world :attr (get ent)))

@@ -105,6 +105,13 @@
         (swap! state/ui assoc :los (seq (vis/player-los @state/world a b)))))
     (swap! state/ui dissoc :los)))
 
+(defn handle-info
+  [handled comms]
+  (if (and (not @api/info) (comms :info))
+    (let [mc @api/world-cell
+          e (api/creature-aware-of-at mc)
+          info (when e (tuple :ent e))]
+      (swap! state/ui assoc :info info))))
 
 (defn handle-cast
   [handled comms]
@@ -126,7 +133,9 @@
 (defn handle-cancel
   [handled comms]
   (when (comms :cancel)
-    (cond @api/casting (api/end-cast))
+    (cond
+      @api/info (swap! state/ui dissoc :info)
+      @api/casting (api/end-cast))
     (conj handled :cancel)))
 
 (defn only-in-game
@@ -209,6 +218,8 @@
 
         (-> handle-cast
             only-realtime-or-player)
+
+        (-> handle-info)
 
         handle-cancel
         handle-cam]))

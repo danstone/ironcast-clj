@@ -7,14 +7,15 @@
             [ironcast.pure.pos :as pos]
             [ironcast.pure.move :as move]
             [ironcast.pure.act :as act]
-            [ironcast.pure.time  :as time]
+            [ironcast.pure.time :as time]
             [ironcast.pure.spell :as spell]
             [ironcast.io :as io]
             [ironcast.db :as db]
             [ironcast.tiled :as tiled]
             [ironcast.util :refer :all]
             [clj-tuple :refer [tuple]]
-            [ironcast.event :as event]))
+            [ironcast.event :as event]
+            [ironcast.pure.vis :as vis]))
 
 (defn setting
   ([key else]
@@ -89,6 +90,17 @@
 
 ;; UI
 
+(def ui-path
+  (>>
+    (let [world @world
+          ui @ui]
+      (when (time/player? world)
+        (:path ui)))))
+
+(def info
+  (>>
+    (:info @ui)))
+
 (def top-left
   "Deref to get the current top-left co-ord in gl co-ordinates"
   (>> (tuple
@@ -113,6 +125,7 @@
         (/ @screen-width -2)
         (/ @screen-height 2))))
 
+
 (def game-rect
   "Deref to get the current `game-rect`, that is the view port inside the main ui that
    displays the in game action!"
@@ -125,6 +138,7 @@
         y
         (- sw 320)
         (- sh 228)))))
+
 
 (defn player-rect
   [n]
@@ -154,12 +168,15 @@
             x (+ x mx)]
         (tuple x (- y my)))))
 
+(defn mouse-in-game?*
+  []
+  (let [[x y w h] @game-rect]
+    (pt-in-screen? x y w h @screen-pos)))
+
 (def mouse-in-game?
   "Is the mouse captured by the game area?"
-  (>>
-    (let [[x y w h] @game-rect]
-      (pt-in-screen? x y w h @screen-pos))))
-
+  (>> (when-not @info
+        (mouse-in-game?*))))
 
 (defn mouse-in?
   ([[x y w h]]
@@ -179,11 +196,16 @@
   (and (@commands :select-hold)
        (mouse-in? x y w h)))
 
+(defn mouse-in-player*
+  []
+  (-> (filter (fn [[i _]] (mouse-in? (player-rect i)))
+              (map-indexed tuple (sort (attr/players @world))))
+      first
+      second))
+
 (def mouse-in-player
-  (>> (-> (filter (fn [[i _]] (mouse-in? (player-rect i)))
-                  (map-indexed tuple (sort (attr/players @world))))
-          first
-          second)))
+  (>> (when-not @info
+        (mouse-in-player*))))
 
 ;;LASSO
 
@@ -200,13 +222,6 @@
       (when (:lassoing? ui)
         (:lasso-world ui)))))
 
-;;UI PATH
-(def ui-path
-  (>>
-    (let [world @world
-          ui @ui]
-      (when (time/player? world)
-        (:path ui)))))
 
 ;;CAM
 
@@ -330,6 +345,14 @@
   [pt]
   (pos/not-solid-at? @world pt))
 
+(defn aware-of
+  [pt]
+  (vis/aware-of @world pt))
+
+(defn creature-aware-of-at
+  [pt]
+  (let [w @world]
+    (first (filter #(attr/creature? w %) (vis/aware-of w pt)))))
 
 (defn create
   [try-f & args]
@@ -421,6 +444,13 @@
   ([ent attribute else]
    (attr/attr @world ent attribute else)))
 
+(defn all-attrs
+  [ent]
+  (attr/all @world ent))
+
+(defn all-flags
+  [ent]
+  (attr/all-flags @world ent))
 
 (defn other-actions
   [ent pt]
@@ -529,14 +559,16 @@
   (doseq [[name pt] (map tuple dwarves (flood pt not-solid?))]
     (creature pt #{:player}
               :sprite (sprite :dwarf-male)
-              :name name)))
+              :name name
+              :descr "A Dwarf")))
 
 (defn goblins
   [n pt]
   (doseq [pt (take n (flood pt not-solid?))]
     (creature pt #{:enemy :ai}
               :sprite (sprite :goblin-slave)
-              :name "Goblin")))
+              :name "Goblin"
+              :descr "A goblin")))
 
 
 (defn seed

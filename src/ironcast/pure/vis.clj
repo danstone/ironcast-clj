@@ -13,6 +13,11 @@
   [world pt]
   (-> world :explored (get pt) boolean))
 
+(defn aware-of
+  [world pt]
+  (cond (visible? world pt) (at world pt)
+        (explored? world pt) (filter #(not (creature? world %)) (at world pt))))
+
 (defn add-visibility
   [world visibility]
   (assoc world :visible visibility

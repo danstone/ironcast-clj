@@ -14,11 +14,12 @@
         world @state/world]
     (gfx/set-cam! cam)
     (draw-world world)
-    (base/draw-path!)
-    (base/draw-aoe!)
-    (base/draw-los!)
-    (base/draw-lasso!)
-    (base/draw-world-text!)
+    (when-not @api/info
+      (base/draw-path!)
+      (base/draw-aoe!)
+      (base/draw-los!)
+      (base/draw-lasso!)
+      (base/draw-world-text!))
     (gfx/release-cam! cam)))
 
 

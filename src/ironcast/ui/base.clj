@@ -2,7 +2,8 @@
   (:require [ironcast.internals.gfx :as gfx]
             [ironcast.api :as api]
             [ironcast.util :refer :all]
-            [ironcast.state :as state]))
+            [ironcast.state :as state]
+            [ironcast.pure.attr :as attr]))
 
 (defn scroll-down
   [i]
@@ -19,6 +20,10 @@
 (defn draw-text!
   [text x y]
   (gfx/draw-text! @api/default-font text x y))
+
+(defn draw-text-wrapped!
+  [text x y width]
+  (gfx/draw-text-wrapped! @api/default-font text x y width))
 
 (defn draw-blank!
   [x y width height]
@@ -64,6 +69,31 @@
     (gfx/with-font-color
       font color
       (gfx/draw-text! font text x y))))
+
+(defn draw-hp
+  [world ent x y]
+  (let [hp-str (str "hp: " (attr/current-hp world ent)
+                    "/" (attr/max-hp world ent))
+        [w h] (gfx/text-bounds @api/default-font hp-str)]
+    (draw-hover-text! @api/default-font hp-str x y
+                      x (- y 16)
+                      w h)))
+
+(defn draw-ap
+  [world ent x y]
+  (let [ap-str (str "ap: " (attr/current-ap world ent)
+                    "/" (attr/max-ap world ent))
+        [w h] (gfx/text-bounds @api/default-font ap-str)]
+    (draw-hover-text! @api/default-font ap-str x y
+                      x (- y 16)
+                      w h)))
+(defn draw-fatigue
+  [world ent x y]
+  (let [fatigue (str "fatigue " (attr/fatigue world ent))
+        [w h] (gfx/text-bounds @api/default-font fatigue)]
+    (draw-hover-text! @api/default-font fatigue x y
+                      x (- y 16)
+                      w h)))
 
 (defn draw-lasso!
   []

@@ -5,6 +5,7 @@
             [ironcast.ui.players :as players]
             [ironcast.ui.mouse :as mouse]
             [ironcast.ui.actions :as actions]
+            [ironcast.ui.info :as info]
             [ironcast.api :as api]
             [ironcast.util :refer :all]
             [ironcast.internals.gfx :as gfx]
@@ -51,13 +52,15 @@
 (defn draw
   []
   (gfx/with-font-color @api/default-font :off-white
-    (shell/draw-shell)
-    (players/draw-players)
-    (controls/draw-turn-timer)
-    (controls/draw-descr-bar)
-    (controls/draw-menu-buttons)
-    (controls/draw-action-buttons)
-    (controls/draw-action-bar)
-    (actions/draw)
-    (debug/draw-debug)
+    (when-not @api/info
+      (shell/draw-shell)
+      (players/draw-players)
+      (controls/draw-turn-timer)
+      (controls/draw-descr-bar)
+      (controls/draw-menu-buttons)
+      (controls/draw-action-buttons)
+      (controls/draw-action-bar)
+      (actions/draw)
+      (debug/draw-debug))
+    (info/draw-info-pane)
     (draw-mouse)))
