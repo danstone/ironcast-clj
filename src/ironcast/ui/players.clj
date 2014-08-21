@@ -1,5 +1,6 @@
 (ns ironcast.ui.players
   (:require [ironcast.internals.gfx :as gfx]
+            [ironcast.gfx.world :as wgfx]
             [ironcast.util :refer :all]
             [ironcast.ui.base :refer :all]
             [ironcast.api :as api]
@@ -35,7 +36,7 @@
         (gfx/draw-text! @api/default-font name
                         (+ x 3)
                         (- y 3))
-        (gfx/draw-sprite! sprite (+ x 16) (- y 96) 64 64)
+        (wgfx/draw-creature @state/world player (+ x 16) (- y 96) 64 64)
         (draw-stats x y player)))))
 
 (defn draw-players
