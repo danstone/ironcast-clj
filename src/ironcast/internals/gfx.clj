@@ -97,7 +97,27 @@
           ^float x
           ^float y
           ^float w
-          ^float h)))
+          ^float h))
+  ([^TextureRegion tex x y w h flip-x flip-y]
+   (.draw *batch* (.getTexture tex)
+          x y
+          0 0
+          w h
+          1.0
+          1.0
+          0.0
+          (.getRegionX tex)
+          (.getRegionY tex)
+          (.getRegionWidth tex)
+          (.getRegionHeight tex)
+          flip-x
+          flip-y)))
+
+;;draw(Texture texture,
+;; float x, float y, float originX, float originY, float width, float height,
+;; float scaleX, float scaleY, float rotation,
+;; int srcX, int srcY, int srcWidth, int srcHeight,
+;; boolean flipX, boolean flipY)
 
 (defn text-bounds
   [^BitmapFont font str]
@@ -119,7 +139,9 @@
   ([{tex :region} x y w h]
    (draw-region! tex x y w h))
   ([{tex :region} ^double x ^double y]
-   (draw-region! tex x y)))
+   (draw-region! tex x y))
+  ([{tex :region} x y w h flip-x flip-y]
+   (draw-region! tex x y w h flip-x flip-y)))
 
 
 (defn draw-border!

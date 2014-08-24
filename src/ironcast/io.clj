@@ -15,7 +15,7 @@
 (defn json
   [file]
   (println "loading json..." file)
-  (json/parse-string (slurp file) true))
+  (json/parse-string (slurp file) keyword))
 
 (defn edn
   [file]

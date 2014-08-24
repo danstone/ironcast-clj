@@ -11,5 +11,4 @@
   []
   (api/set-setting :max-fps 0))
 
-
 (go)

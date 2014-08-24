@@ -244,11 +244,13 @@
 
 (defn unequip
   [world ent item]
-  (update-attr world ent disj item))
+  (-> (update-attr world ent disj item)
+      (rem-attr item :on)))
 
 (defn equip
   [world ent item]
-  (update-attr world ent :equip set-conj item))
+  (-> (update-attr world ent :equip set-conj item)
+      (add-attr item :on ent)))
 
 (def default-hp (tuple 10 10))
 

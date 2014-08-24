@@ -57,10 +57,13 @@
 (defn draw-creature
   [world ent x y w h]
   (let [base (attr world ent :sprite)
-        equip (attr world ent :equip)
-        equip-sprites (keep #(attr world % :equip-sprite) equip)]
-    (doseq [sprite (cons base equip-sprites)]
-      (draw-sprite! (api/sprite sprite) x y w h))))
+        equip (attr world ent :equip)]
+    (draw-sprite! (api/sprite base) x y w h)
+    (doseq [e equip
+            :let [spr (attr world e :equip-sprite)
+                  flip? (boolean (has-flag? world e :flip))]
+            :when spr]
+      (draw-sprite! (api/sprite spr) x y w h flip? false))))
 
 (defn draw-creatures
   [world]

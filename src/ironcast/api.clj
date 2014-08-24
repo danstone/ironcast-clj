@@ -584,8 +584,12 @@
   [pt]
   (doseq [[name pt] (map tuple dwarves (flood pt not-solid?))]
     (let [ent (dwarf name pt)
-          item (leather-armour)]
-      (update-world attr/equip ent item))))
+          armour (leather-armour)
+          sword (item #{:hand}
+                      :sprite :sword
+                      :equip-sprite :sword-equip)]
+      (update-world attr/equip ent armour)
+      (update-world attr/equip ent sword))))
 
 (defn goblin
   [pt]
@@ -614,16 +618,13 @@
                            new-world))
           (dwarfs [17 18])
           (goblins 8 [16 21])
-          (create create/closed-door [9 19]
-                  :closed-sprite (sprite :door-closed)
-                  :open-sprite (sprite :door-open)
-                  :name "Wooden Door")
-          (create create/closed-door [9 17]
-                  :closed-sprite (sprite :door-closed)
-                  :open-sprite (sprite :door-open)
-                  :name "Wooden Door")
           "success")
       "failed")))
+
+(defn reload-all
+  []
+  (load-db)
+  (test-world))
 
 (defn blat-world
   []

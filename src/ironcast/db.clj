@@ -60,8 +60,10 @@
     :fonts fonts))
 
 (defn find-sprite
-  [db key]
-  (-> db :sprite-index (get key)))
+  ([db key else]
+    (-> db :sprite-index (get key else)))
+  ([db key]
+   (find-sprite db key nil)))
 
 (defn find-font
   [db key]

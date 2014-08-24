@@ -111,4 +111,10 @@
    :scale-armour 0 64 32 32
    :scale-armour-equip 32 64 32 32
    :splint-armour 0 96 32 32
-   :splint-armour-equip 32 96 32 32]}
+   :splint-armour-equip 32 96 32 32]
+ "Weapons"
+  [:sword-equip 0 0 32 32
+   :sword 32 0 32 32
+   :javelin 32 32 32 32
+   :bow-equip 0 64 32 32
+   :bow 32 64 32 32]}

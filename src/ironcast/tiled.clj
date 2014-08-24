@@ -3,7 +3,8 @@
             [clj-tiny-grid.core :as grid]
             [ironcast
              [util :refer :all]]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.edn :as edn]))
 
 
 ;;layers
@@ -133,10 +134,15 @@
   (for [o (:objects layer)
         :let [{:keys [x y width height]} o]]
     (merge (dissoc o
-                   :x :y :width :height :visible)
+                   :x :y :width :height :visible :properties)
            {:rect (-> [x y width height]
                       (div-rectn 32)
-                      int-tuple)})))
+                      int-tuple)}
+           (->> (for [[k v] (:properties o)]
+                  (do
+                    [(->> k str edn/read-string)
+                     (edn/read-string v)]))
+                (into {})))))
 
 
 (defn terrain
