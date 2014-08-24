@@ -16,6 +16,12 @@
     (-> (update-in world [:flags ent] set-conj flag)
         (update-in [:with-flag flag] set-conj ent))))
 
+(defn add-flags
+  [world ent flags]
+  (if (seq flags)
+    (apply add-flag world ent flags)
+    world))
+
 (defn rem-flag
   ([world ent flag & flags]
    (reduce #(rem-flag %1 ent %2)

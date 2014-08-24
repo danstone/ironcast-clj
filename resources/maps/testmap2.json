@@ -31,9 +31,9 @@
                  "name":"transition-up",
                  "properties":
                     {
-                     "to":":testmap"
+                     "to":":test"
                     },
-                 "type":"transition",
+                 "type":":transition",
                  "visible":true,
                  "width":32,
                  "x":512,

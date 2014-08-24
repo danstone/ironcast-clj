@@ -191,4 +191,16 @@
    (try-create-world {} db tiled-map)))
 
 
+(defn snapshot
+  [world ent]
+  {:ent ent
+   :attrs (all world ent)
+   :flags (all-flags world ent)})
+
+(defn unsnapshot
+  [world snapshot]
+  (let [ent (:ent snapshot)]
+    (->
+      (add-flags world ent (:flags snapshot))
+      (add-attrs ent (:attrs snapshot)))))
 

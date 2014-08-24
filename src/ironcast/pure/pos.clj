@@ -120,9 +120,9 @@
 (defn distance
   "Calculate the manhattan distance
    between entity `a` and `b`"
-  [em entity-a entity-b]
-  (let [a (pos em entity-a)
-        b (pos em entity-b)]
+  [world entity-a entity-b]
+  (let [a (pos world entity-a)
+        b (pos world entity-b)]
     (or (and a b (manhattan-dist a b))
         Integer/MAX_VALUE)))
 
@@ -202,5 +202,17 @@
 (defn closed-at?
   [world pt]
   (pred-at? world closed? pt))
+
+(defn closest-to-transition
+  [world transition]
+  (when-let [pt (pos world transition)]
+    (flood pt #(not-solid-at? world %))))
+
+(defn starting-pts
+  [world]
+  (if-let [start (-> world :with-flag :start seq)]
+    (keep #(pos world %) start)
+    (when-let [trans (-> world :with-flag :transition seq)]
+      (some #(seq (closest-to-transition world %)) trans))))
 
 

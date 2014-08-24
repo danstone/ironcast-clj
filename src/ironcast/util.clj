@@ -298,15 +298,15 @@
 ;;todo efficient functional algorithm here?
 (defn- flood*
   [^Deque q ^Set hs pred]
-  (if (< 0 (.size q))
-    (let [n (.poll q)]
-      (if (pred n)
-        (lazy-seq
-          (doseq [a (cardinal-adj n)
-                  :when (.add hs a)]
-            (.addFirst q a))
-          (cons n (flood* q hs pred)))
-        (lazy-seq
+  (lazy-seq
+    (when (< 0 (.size q))
+      (let [n (.poll q)]
+        (if (pred n)
+          (do
+            (doseq [a (cardinal-adj n)
+                    :when (.add hs a)]
+              (.addFirst q a))
+            (cons n (flood* q hs pred)))
           (flood* q hs pred))))))
 
 (defn flood

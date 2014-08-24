@@ -4,7 +4,9 @@
             [ironcast.util :refer :all]
             [ironcast.pure.act :as act]
             [ironcast.pure.pos :as pos]
-            [clj-tuple :refer [tuple]]))
+            [clj-tuple :refer [tuple]]
+            [ironcast.pure.create :as create]
+            [ironcast.db :as db]))
 
 (defonce act-chan (chan))
 (defonce act-mult (mult act-chan))
@@ -73,4 +75,23 @@
 
 (defmethod act-applied :transition
   [world event]
-  (println "Transit to" event))
+  (println "Transit to" event)
+  (let [[new-world success?]
+        (try-state [world nil]
+                   (create/try-create-world
+                     {:gid (:gid @state/world)}
+                     @state/db
+                     (db/find-map @state/db (:to event)))
+                   (let [points (take 6 (pos/starting-pts world))]
+                     (create/try-create-many
+                       world
+                       (fn [w [player pt]]
+                         (let [ent (:ent player)]
+                           (pos/try-put
+                             (create/unsnapshot w player)
+                             ent
+                             pt)))
+                       (map tuple (:players event) points))))]
+    (if success?
+      (dosync
+        (ref-set state/world new-world)))))

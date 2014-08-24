@@ -581,8 +581,8 @@
 
 (defn dwarfs
   "Creates a test party"
-  [pt]
-  (let [start (map pos (-> @world :with-flag :start))]
+  []
+  (let [start (pos/starting-pts @world)]
     (doseq [[name pt] (map tuple dwarves start)]
       (let [ent (dwarf name pt)
             armour (leather-armour)
@@ -616,7 +616,7 @@
     (if success?
       (do (dosync (ref-set world
                            new-world))
-          (dwarfs [17 18])
+          (dwarfs)
           (goblins 8 [16 21])
           "success")
       "failed")))

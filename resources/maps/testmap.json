@@ -115,7 +115,7 @@
                  "properties":
                     {
                      "text":"\"Travel to level 2\"",
-                     "to":":testmap2"
+                     "to":":test2"
                     },
                  "type":":transition",
                  "visible":true,

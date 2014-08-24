@@ -5,7 +5,9 @@
              [move :refer :all]]
             [ironcast.util :refer :all]
             [ironcast.pure.time :as time]
-            [ironcast.pure.attr :as attr]))
+            [ironcast.pure.attr :as attr]
+            [ironcast.pure.vis :as vis]
+            [ironcast.pure.create :as create]))
 
 (defmulti applies? (fn [_ _ _ action] (:type action)))
 
@@ -289,10 +291,14 @@
   {:type :transition
    :name "Transition"})
 
+
 (defmethod could? :transition
   [world ent pt _]
-  (and (transition-at? world pt)
-       (pos-adj? world ent pt)))
+  (let [tra (transition-at world pt)]
+    (and
+      tra
+      (vis/visible? world pt)
+      (<= (reduce max 0 (map #(distance world %1 tra) (players world))) 10))))
 
 (defmethod show :transition
   [world ent pt _]
@@ -311,7 +317,8 @@
 (defmethod prepare :transition
   [world ent pt action]
   (assoc action
-    :to (attr world (transition-at world pt) :to)))
+    :to (attr world (transition-at world pt) :to)
+    :players (map #(create/snapshot world %) (players world))))
 
 (defmethod try-perform :transition
   [world action]
