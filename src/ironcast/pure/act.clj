@@ -305,14 +305,6 @@
   (let [trans (transition-at world pt)]
     (attr world trans :text "Travel to ???")))
 
-(defn remove-all-players
-  [world]
-  (let [players (players world)
-        f (fn [world ent]
-            (-> (rem-all-attrs world ent)
-                (rem-all-flags ent)
-                (unput ent)))]
-    (reduce f world players)))
 
 (defmethod prepare :transition
   [world ent pt action]
@@ -322,7 +314,7 @@
 
 (defmethod try-perform :transition
   [world action]
-  (success (remove-all-players world)))
+  (success world))
 
 ;; DEFAULTS
 

@@ -36,7 +36,8 @@
   [world b los]
   (if (transparent-at? world b)
     (= (last los) b)
-    (adj? (last los) b)))
+    (when-let [l (last los)]
+      (adj? l b))))
 
 (defn los?
   [world a b]

@@ -49,6 +49,8 @@
 (defonce db (atom {}))
 
 (defonce world (ref {}))
+(defonce gid (ref 0))
+
 (defonce log (ref '()))
 (defonce world-text (ref '()))
 

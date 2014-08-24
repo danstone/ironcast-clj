@@ -66,11 +66,17 @@
     (api/setting :move-ms 150)
     (api/update-world move/step-all)))
 
+(defn do-looker
+  []
+  (try
+    (let [vis (vis/player-visibility @state/world)]
+      (api/update-world vis/add-visibility vis))
+    (catch Throwable t)))
+
 (defonce looker
   (looper
     (api/setting :vis-ms 250)
-    (let [vis (vis/player-visibility @state/world)]
-      (api/update-world vis/add-visibility vis))))
+    (do-looker)))
 
 (defn do-ai
   [ent]

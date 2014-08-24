@@ -584,20 +584,23 @@
   []
   (let [start (pos/starting-pts @world)]
     (doseq [[name pt] (map tuple dwarves start)]
-      (let [ent (dwarf name pt)
-            armour (leather-armour)
-            sword (item #{:hand}
-                        :sprite :sword
-                        :equip-sprite :sword-equip)]
-        (update-world attr/equip ent armour)
-        (update-world attr/equip ent sword)))))
+      (ironcast.create/create!
+        {:type :creature
+         :name name
+         :flags #{:player}
+         :pos pt
+         :sprite (sprite :dwarf-male)
+         :descr "A dwarf"}))))
 
 (defn goblin
   [pt]
-  (creature pt #{:enemy :ai}
-            :sprite (sprite :goblin-slave)
-            :name "Goblin"
-            :descr "A goblin"))
+  (ironcast.create/create!
+    {:type :creature
+     :name "Goblin"
+     :flags #{:enemy :ai}
+     :descr "A goblin"
+     :pos pt
+     :sprite (sprite :goblin-slave)}))
 
 (defn goblins
   [n pt]
@@ -608,18 +611,14 @@
   []
   (long (rand Long/MAX_VALUE)))
 
+
 (defn test-world
   []
-  (let [[new-world success?] (try-create-world
-                               @db
-                               (find-map :test))]
-    (if success?
-      (do (dosync (ref-set world
-                           new-world))
-          (dwarfs)
-          (goblins 8 [16 21])
-          "success")
-      "failed")))
+  (ironcast.create/create-world! (-> @db :tiled-maps :test))
+  (dwarfs)
+  (goblins 8 [16 21])
+  nil)
+
 
 (defn reload-all
   []
