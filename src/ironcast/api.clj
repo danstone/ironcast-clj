@@ -582,14 +582,15 @@
 (defn dwarfs
   "Creates a test party"
   [pt]
-  (doseq [[name pt] (map tuple dwarves (flood pt not-solid?))]
-    (let [ent (dwarf name pt)
-          armour (leather-armour)
-          sword (item #{:hand}
-                      :sprite :sword
-                      :equip-sprite :sword-equip)]
-      (update-world attr/equip ent armour)
-      (update-world attr/equip ent sword))))
+  (let [start (map pos (-> @world :with-flag :start))]
+    (doseq [[name pt] (map tuple dwarves start)]
+      (let [ent (dwarf name pt)
+            armour (leather-armour)
+            sword (item #{:hand}
+                        :sprite :sword
+                        :equip-sprite :sword-equip)]
+        (update-world attr/equip ent armour)
+        (update-world attr/equip ent sword)))))
 
 (defn goblin
   [pt]

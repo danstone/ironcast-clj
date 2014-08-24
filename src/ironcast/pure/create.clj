@@ -120,6 +120,16 @@
         f (if open? open-door closed-door)]
     (apply f world ent pos (apply concat attrs))))
 
+(defn start-pad
+  [world ent pt attrs]
+  (-> (add-flag world ent :start)
+      (add-attrs ent attrs)
+      (try-put ent pt)))
+
+(defmethod try-create-object :start
+  [world ent db obj]
+  (start-pad world ent (:pos obj) obj))
+
 (defn try-create
   [world try-f & args]
   (let [[nw-a id] (next-id world)]
@@ -155,7 +165,7 @@
         :type :decor)])
 
 (defn objectify-obj
-  [db obj]
+  [obj]
   (for [pt (rect-pts (:rect obj))]
     (assoc (update obj :type read-string)
       :pos pt)))
@@ -164,7 +174,7 @@
   [db seed tiled-map]
   (let [objects (concat (mapcat #(objectify-terrain db %) (:terrain tiled-map))
                         (mapcat #(objectify-decor db %) (:decor tiled-map))
-                        (mapcat #(objectify-obj db %) (:objects tiled-map)))]
+                        (mapcat objectify-obj (:objects tiled-map)))]
     (try-create-many
       {:width  (:width tiled-map)
        :height (:height tiled-map)

@@ -33,7 +33,7 @@
                     {
 
                     },
-                 "type":"start",
+                 "type":":start",
                  "visible":true,
                  "width":96,
                  "x":480,
