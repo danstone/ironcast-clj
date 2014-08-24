@@ -5,7 +5,7 @@
             [ironcast.util :refer :all]
             [clojure.edn :as edn]))
 
-(defmulti try-create-object (fn [world ent pt obj] (:type obj)))
+(defmulti try-create-object (fn [world ent db obj] (:type obj)))
 
 (defmethod try-create-object :default
   [world ent db obj]
