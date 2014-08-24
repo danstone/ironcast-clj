@@ -46,7 +46,12 @@
          (into {}))))
 
 (def tiled-maps
-  (fnk [maps] (map-values tiled/create-map maps)))
+  (fnk [maps]
+       (->>
+         (for [[k v] maps]
+           [k (assoc (tiled/create-map v)
+                :name k)])
+         (into {}))))
 
 (def graph
   (graph/eager-compile

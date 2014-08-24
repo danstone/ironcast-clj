@@ -28,19 +28,6 @@
          "objects":[
                 {
                  "height":64,
-                 "name":"start",
-                 "properties":
-                    {
-
-                    },
-                 "type":":start",
-                 "visible":true,
-                 "width":96,
-                 "x":480,
-                 "y":928
-                }, 
-                {
-                 "height":64,
                  "name":"encounter",
                  "properties":
                     {
@@ -108,6 +95,32 @@
                  "width":32,
                  "x":704,
                  "y":608
+                }, 
+                {
+                 "height":64,
+                 "name":"start",
+                 "properties":
+                    {
+
+                    },
+                 "type":":start",
+                 "visible":true,
+                 "width":96,
+                 "x":480,
+                 "y":576
+                }, 
+                {
+                 "height":32,
+                 "name":"transition-down",
+                 "properties":
+                    {
+                     "to":":testmap2"
+                    },
+                 "type":":transition",
+                 "visible":true,
+                 "width":64,
+                 "x":480,
+                 "y":416
                 }],
          "opacity":1,
          "type":"objectgroup",

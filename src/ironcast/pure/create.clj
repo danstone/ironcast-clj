@@ -130,6 +130,12 @@
   [world ent db obj]
   (start-pad world ent (:pos obj) obj))
 
+(defmethod try-create-object :transition
+  [world ent db obj]
+  (-> (add-flag world ent :transition)
+      (add-attrs ent obj)
+      (try-put ent (:pos obj))))
+
 (defn try-create
   [world try-f & args]
   (let [[nw-a id] (next-id world)]
@@ -171,18 +177,18 @@
       :pos pt)))
 
 (defn try-create-world
-  [db seed tiled-map]
-  (let [objects (concat (mapcat #(objectify-terrain db %) (:terrain tiled-map))
-                        (mapcat #(objectify-decor db %) (:decor tiled-map))
-                        (mapcat objectify-obj (:objects tiled-map)))]
-    (try-create-many
-      {:width  (:width tiled-map)
-       :height (:height tiled-map)
-       :seed   (long seed)}
-      #(try-create %1 try-create-object db %2)
-      objects)))
-
-
+  ([world db tiled-map]
+   (let [objects (concat (mapcat #(objectify-terrain db %) (:terrain tiled-map))
+                         (mapcat #(objectify-decor db %) (:decor tiled-map))
+                         (mapcat objectify-obj (:objects tiled-map)))]
+     (try-create-many
+       (merge world {:width  (:width tiled-map)
+                     :height (:height tiled-map)
+                     :name (:name tiled-map)})
+       #(try-create %1 try-create-object db %2)
+       objects)))
+  ([db tiled-map]
+   (try-create-world {} db tiled-map)))
 
 
 

@@ -347,4 +347,3 @@
       (<= total (/ ap 2)) :green-flag
       (<= total ap) :yellow-flag
       :otherwise :red-flag)))
-

@@ -1,1 +1,2 @@
-{:test "resources/maps/testmap.json"}
+{:test "resources/maps/testmap.json"
+ :test2 "resources/maps/testmap2.json"}
