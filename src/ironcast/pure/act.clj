@@ -6,8 +6,7 @@
             [ironcast.util :refer :all]
             [ironcast.pure.time :as time]
             [ironcast.pure.attr :as attr]
-            [ironcast.pure.vis :as vis]
-            [ironcast.pure.create :as create]))
+            [ironcast.pure.vis :as vis]))
 
 (defmulti applies? (fn [_ _ _ action] (:type action)))
 
@@ -309,8 +308,7 @@
 (defmethod prepare :transition
   [world ent pt action]
   (assoc action
-    :to (attr world (transition-at world pt) :to)
-    :players (map #(create/snapshot world %) (players world))))
+    :to (attr world (transition-at world pt) :to)))
 
 (defmethod try-perform :transition
   [world action]

@@ -2,7 +2,7 @@
   (:import (com.badlogic.gdx Gdx))
   (:require [ironcast.state :refer :all]
             [ironcast.internals.cam :as cam]
-            [ironcast.pure.create :refer [try-create-world] :as create]
+            [ironcast.create :as create]
             [ironcast.pure.attr :as attr]
             [ironcast.pure.pos :as pos]
             [ironcast.pure.move :as move]
@@ -356,22 +356,6 @@
   (let [w @world]
     (first (filter #(attr/creature? w %) (vis/aware-of w pt)))))
 
-(defn create
-  [try-f & args]
-  (dosync
-    (let [w @world
-          [new-w id] (apply create/try-create w try-f args)]
-      (ref-set world new-w)
-      id)))
-
-(defn creature
-  [pt & opts]
-  (apply create create/creature pt opts))
-
-(defn item
-  [flags & attrs]
-  (apply create create/item flags attrs))
-
 (def items
   (>> (-> @world :with-flag :item)))
 
@@ -566,25 +550,13 @@
 
 (def dwarves ["Sleepy" "Bashful" "Grumpy" "Dopey" "Doc" "Sneezy"])
 
-(defn dwarf
-  [name pt]
-  (creature pt #{:player}
-            :sprite (sprite :dwarf-male)
-            :name name
-            :descr "A Dwarf"))
-
-(defn leather-armour
-  []
-  (item #{:torso}
-        :sprite :leather-armour
-        :equip-sprite :leather-armour-equip))
 
 (defn dwarfs
   "Creates a test party"
   []
   (let [start (pos/starting-pts @world)]
     (doseq [[name pt] (map tuple dwarves start)]
-      (ironcast.create/create!
+      (create/create!
         {:type :creature
          :name name
          :flags #{:player}
@@ -594,7 +566,7 @@
 
 (defn goblin
   [pt]
-  (ironcast.create/create!
+  (create/create!
     {:type :creature
      :name "Goblin"
      :flags #{:enemy :ai}
