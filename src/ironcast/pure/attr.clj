@@ -27,8 +27,9 @@
 
 (defn rem-all-flags
   [world ent]
-  (let [flags (-> world :flags (get ent))]
-    (apply rem-flag world ent flags)))
+  (if-let [flags (-> world :flags (get ent) seq)]
+    (apply rem-flag world ent flags)
+    world))
 
 (defn clear-flag
   [world flag]
@@ -113,6 +114,10 @@
 (defn decor?
   [world ent]
   (has-flag? world ent :decor))
+
+(defn transition?
+  [world ent]
+  (has-flag? world ent :transition))
 
 (defn creature?
   [world ent]

@@ -11,12 +11,9 @@
 
 
 (defn textify
-  [index {:keys [name text cost]}]
-  (str (inc index) ". " (or text name) " (" cost ")"))
+  [index world ent pt act]
+  (str (inc index) ". " (act/show world ent pt act)))
 
-(defn action-text
-  [actions]
-  (str/join "\n" (map-indexed (fn [i a] (textify i a)) actions)))
 
 (defn draw-action
   [world ent action font text x y]
@@ -28,7 +25,8 @@
 (defn draw-actions
   [world ent actions]
   (let [[x y] @api/screen-pos
-        strings (map-indexed textify actions)
+        pt @api/world-cell
+        strings (map-indexed #(textify %1 world ent pt %2) actions)
         bounds (map #(gfx/text-bounds @api/default-font %) strings)
         w (apply max (map first bounds))
         n (count actions)

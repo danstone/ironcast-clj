@@ -35,7 +35,8 @@
         (when-let [l (act/log nw event)]
           (alter state/log #(apply conj % l)))
         (when-let [wt (act/world-text nw event)]
-          (alter state/world-text concat wt))))))
+          (alter state/world-text concat wt))
+        true))))
 
 (defonce act-applier
   (let [c (chan)]
@@ -44,8 +45,8 @@
       []
       (try
         (let [a (<! c)]
-          (act-apply a)
-          (act-applied @state/world a))
+          (when (act-apply a)
+            (act-applied @state/world a)))
         (catch Exception e
                (.printStackTrace ^Exception e)))
       (recur))))
@@ -69,3 +70,7 @@
 (defmethod act-applied :trip
   [world event]
   (attack-ent-shift world event))
+
+(defmethod act-applied :transition
+  [world event]
+  (println "Transit to" event))

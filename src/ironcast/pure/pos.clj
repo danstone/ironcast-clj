@@ -28,9 +28,13 @@
   (when pt
     (mapcat #(at world %) (adj pt))))
 
+(defn pred-at
+  [world pred pt]
+  (first (filter #(pred world %) (at world pt))))
+
 (defn pred-at?
   [world pred pt]
-  (boolean (some #(pred world %) (at world pt))))
+  (some? (pred-at world pred pt)))
 
 (defn solid-at?
   [world pt]
@@ -48,9 +52,17 @@
   [world pt]
   (not (opaque-at? world pt)))
 
+(defn transition-at
+  [world pt]
+  (pred-at world transition? pt))
+
+(defn transition-at?
+  [world pt]
+  (pred-at? world transition? pt))
+
 (defn creature-at
   [world pt]
-  (first (filter #(creature? world %) (at world pt))))
+  (pred-at world creature? pt))
 
 (defn enemies-of-at
   [world ent pt]

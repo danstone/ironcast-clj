@@ -114,6 +114,7 @@
                  "name":"transition-down",
                  "properties":
                     {
+                     "text":"\"Travel to level 2\"",
                      "to":":testmap2"
                     },
                  "type":":transition",

@@ -23,7 +23,7 @@
 (defmulti prepare (fn [_ _ _ action] (:type action)))
 
 (defmethod prepare :default
-  [_ action]
+  [world ent pt action]
   action)
 
 (defmulti try-perform (fn [_ action] (:type action)))
@@ -49,6 +49,12 @@
 (defmethod world-text :default
   [world action]
   nil)
+
+(defmulti show (fn [world ent pt action] (:type action)))
+
+(defmethod show :default
+  [_ _ _ {:keys [name text cost]}]
+  (str (or text name) (when cost (str " (" cost ")"))))
 
 (defmulti descr (fn [world ent pt action] (:type action)))
 
@@ -277,8 +283,39 @@
   [world action]
   [(console-log world action)])
 
+;;TRAVEL
 
+(def transition-action
+  {:type :transition
+   :name "Transition"})
 
+(defmethod could? :transition
+  [world ent pt _]
+  (and (transition-at? world pt)
+       (pos-adj? world ent pt)))
+
+(defmethod show :transition
+  [world ent pt _]
+  (let [trans (transition-at world pt)]
+    (attr world trans :text "Travel to ???")))
+
+(defn remove-all-players
+  [world]
+  (let [players (players world)
+        f (fn [world ent]
+            (-> (rem-all-attrs world ent)
+                (rem-all-flags ent)
+                (unput ent)))]
+    (reduce f world players)))
+
+(defmethod prepare :transition
+  [world ent pt action]
+  (assoc action
+    :to (attr world (transition-at world pt) :to)))
+
+(defmethod try-perform :transition
+  [world action]
+  (success (remove-all-players world)))
 
 ;; DEFAULTS
 
@@ -290,7 +327,8 @@
 (def other-actions
   [close-action
    open-action
-   trip-action])
+   trip-action
+   transition-action])
 
 (defn can-afford?
   [world ent action]
