@@ -125,8 +125,8 @@
   [db obj]
   (-> obj
       (update :sprite #(db/find-sprite db % %))
-      (dissoc :attrs :equip)
-      (merge (:attrs obj))))
+      (merge (:attrs obj))
+      (dissoc :attrs :move-goal :path)))
 
 (defn create!
   [obj]
@@ -193,7 +193,9 @@
     (let [players (map #(snapshot world %) (players world))
           removed (reduce clear-equipped world players)
           removed (remove-all-players removed)
-          starts (starting-pts @state/world)]
+          removed (time/stop-motion removed)
+          starts (starting-pts @state/world)
+          starts (concat starts (mapcat adj starts))]
       (swap! state/db assoc-in [:worlds (:name removed)] removed)
       (doseq [[player pt] (map vector players starts)]
         (println "putting player at" pt)

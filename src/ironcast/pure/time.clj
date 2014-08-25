@@ -7,8 +7,7 @@
   "Remove all known paths and move-goals effectively
    stopping the world in motion"
   [world]
-  (-> (clear-attr world :path)
-      (clear-attr :move-goal)))
+  (clear-attr world :path :move-goal))
 
 (defn clear-done
   [world]

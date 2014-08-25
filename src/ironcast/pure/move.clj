@@ -39,7 +39,8 @@
 
 (defn add-paths
   [world ent-path-pairs]
-  (reduce (fn [w [e p]] (add-path w e p)) world ent-path-pairs))
+  (reduce (fn [w [e p]]
+            (add-path w e p)) world ent-path-pairs))
 
 (defn rem-path
   [world ent]
