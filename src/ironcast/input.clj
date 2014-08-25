@@ -170,6 +170,11 @@
     (when (not @api/casting)
       (f handled comms))))
 
+(defn only-in-menu
+  [f menu]
+  (fn [handled comms]
+    (when (= @api/selected-menu menu)
+      (f handled comms))))
 
 (defn handler
   [f]
@@ -186,16 +191,17 @@
 
   (map handler
        [(-> handle-lasso-selection
+            (only-in-menu :game)
             (only-in-mode :real)
             not-when-casting)
 
         (-> handle-selection
+            (only-in-menu :game)
             only-in-game
             only-realtime-or-player
             not-when-casting)
 
         (-> handle-key-selection
-            only-in-game
             only-realtime-or-player
             not-when-casting)
 
@@ -204,25 +210,33 @@
             not-when-casting)
 
         (-> handle-default-actions
+            (only-in-menu :game)
             only-in-game
             only-realtime-or-player
             not-when-casting)
 
         (-> handle-other-action
+            (only-in-menu :game)
             only-in-game
             only-realtime-or-player
             not-when-casting)
 
         (-> handle-los
+            (only-in-menu :game)
             only-realtime-or-player)
 
         (-> handle-cast
+            (only-in-menu :game)
             only-realtime-or-player)
 
-        (-> handle-info)
+        (-> handle-info
+            (only-in-menu :game)
+            only-in-game)
 
         handle-cancel
-        handle-cam]))
+
+        (-> handle-cam
+            (only-in-menu :game))]))
 
 (defn handle-all
   [comms]

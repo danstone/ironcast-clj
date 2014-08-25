@@ -208,3 +208,14 @@
       (swap! state/ui update key scroll-down))
     (when (api/click-held-in? x (+ y h 32) 32 32)
       (swap! state/ui update key + (* 8 @api/delta)))))
+
+
+(defn draw-stats
+  [world ent x y]
+  (gfx/with-color :light-yellow
+                  (gfx/draw-border! @api/blank x y 256 96 1))
+  (let [x (+ x 6)
+        y (- y 6)]
+    (draw-hp world ent x y)
+    (draw-ap world ent x (- y 16))
+    (draw-fatigue world ent x (- y 32))))

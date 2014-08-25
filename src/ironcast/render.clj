@@ -5,7 +5,8 @@
             [ironcast.gfx.world :refer [draw-world]]
             [ironcast.api :as api]
             [ironcast.ui.base :as base]
-            [ironcast.screens.main :as main]))
+            [ironcast.screens.main :as main]
+            [ironcast.screens.stats :as stats]))
 
 
 (defn draw-game
@@ -30,11 +31,17 @@
                     (str "fps " @api/fps)
                     x y)))
 
+(defn draw-main
+  []
+  (draw-game)
+  (main/draw))
+
 (defn render
   []
   (gfx/clear!)
   (when-let [b @state/batch]
     (gfx/with-batch
       b
-      (draw-game)
-      (main/draw))))
+      (case (:selected-menu @state/ui)
+        :stats (stats/draw)
+        (draw-main)))))

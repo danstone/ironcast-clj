@@ -12,16 +12,6 @@
  [_ x y w h]
   (draw-text! "???" (+ x 32) (- y 32)))
 
-(defn draw-stats
-  [world ent x y]
-  (gfx/with-color :light-yellow
-    (gfx/draw-border! @api/blank x y 256 96 1))
-  (let [x (+ x 6)
-        y (- y 6)]
-      (draw-hp world ent x y)
-      (draw-ap world ent x (- y 16))
-      (draw-fatigue world ent x (- y 32))))
-
 (defmethod draw-info :ent
   [[_ ent] x y w h]
   (let [world @state/world
