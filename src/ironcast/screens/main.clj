@@ -10,13 +10,14 @@
             [ironcast.util :refer :all]
             [ironcast.internals.gfx :as gfx]
             [ironcast.pure.act :as act]
-            [ironcast.state :as state]))
+            [ironcast.state :as state]
+            [ironcast.pure.act-pos :as act-pos]))
 
 (def mouse-sprite
   (>> (let [selected (first @api/selected)
             pt @api/world-cell
             world @state/world]
-        (->> (for [action act/default-actions]
+        (->> (for [action act-pos/default-actions]
                (cond
                  (act/can? world selected pt action)
                    (:mouse-sprite action)
@@ -49,10 +50,15 @@
       in-player? (in-player-mouse x y)
       :otherwise (gfx/draw-sprite! (api/sprite :mouse) x y))))
 
+(defn register-act-target
+  []
+  (swap! state/ui assoc :act-target [:pt @api/world-cell]))
+
 (defn draw
   []
   (gfx/with-font-color @api/default-font :off-white
     (when-not @api/info
+      (register-act-target)
       (shell/draw-shell)
       (players/draw-players)
       (controls/draw-turn-timer)

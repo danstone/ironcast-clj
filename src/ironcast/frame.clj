@@ -84,12 +84,6 @@
 (defn frame-background
   []
   (try
-    (swap! state/input input/cycle-state (input/get-state gdx-input) gdx-input)
-    (reset! state/commands
-            (-> @state/input
-                (input/commands-hit (:commands @state/settings))
-                set))
-    (handle-all @state/commands)
     (swap! state/ui ui/update-ui @state/input @state/cam @state/world)
     (let [delta @api/delta]
       (tick-world-text! delta)
@@ -104,7 +98,14 @@
 (defn frame
   []
   (send-off updater (fn [_] (frame-background)))
+  (swap! state/input input/cycle-state (input/get-state gdx-input) gdx-input)
+  (reset! state/commands
+          (-> @state/input
+              (input/commands-hit (:commands @state/settings))
+              set))
+  (handle-all @state/commands)
   (input/hide-hw-cursor)
   (do-on-main-actions)
+  (swap! state/ui dissoc :act-target)
   (render)
   (await updater))

@@ -73,10 +73,10 @@
     (when (comms :select)
       (let [mc @api/world-cell
             ent (first @api/selected)
-            act (api/default-action ent mc)]
+            act (api/default-action ent)]
         (when act
           (doseq [ent @api/selected
-                  :when (api/can-act? act ent mc)]
+                  :when (api/can-act? act ent)]
             (api/act act ent mc)))))))
 
 (def action-comms
@@ -85,14 +85,13 @@
 (defn handle-other-action
   [handled comms]
   (let [ent (first @api/selected)
-        mc @api/world-cell
-        actions (api/other-actions ent mc)]
+        actions (api/other-actions ent)]
     (-> (for [[a k] (map tuple
                          actions
                          action-comms)
               :when (and (comms k)
-                         (api/can-act? a ent mc))]
-          (api/act a ent mc))
+                         (api/can-act? a ent))]
+          (api/act a ent @api/act-target))
         first))
   nil)
 
@@ -216,8 +215,6 @@
             not-when-casting)
 
         (-> handle-other-action
-            (only-in-menu :game)
-            only-in-game
             only-realtime-or-player
             not-when-casting)
 

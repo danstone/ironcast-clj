@@ -7,6 +7,8 @@
             [ironcast.pure.pos :as pos]
             [ironcast.pure.move :as move]
             [ironcast.pure.act :as act]
+            [ironcast.pure.act-pos :as act-pos]            [ironcast.pure.act-pos :as act-pos]
+            [ironcast.pure.act-item :as act-item]
             [ironcast.pure.time :as time]
             [ironcast.pure.spell :as spell]
             [ironcast.io :as io]
@@ -456,17 +458,36 @@
   [ent]
   (attr/all-flags @world ent))
 
+(def act-target
+  (>> (second (:act-target @ui))))
+
+(def act-target-type
+  (>> (first (:act-target @ui))))
+
+(def other-action-seq
+  (>> (case @act-target-type
+        :pt act-pos/other-actions
+        :item act-item/other-actions
+        nil)))
+
+(def default-action-seq
+  (>> (case @act-target-type
+        :pt act-pos/default-actions
+        nil)))
+
 (defn other-actions
-  [ent pt]
-  (filter #(act/could? @world ent pt %) act/other-actions))
+  [ent]
+  (when-let [target @act-target]
+    (filter #(act/could? @world ent target %) @other-action-seq)))
 
 (defn default-actions
-  [ent pt]
-  (filter #(act/can? @world ent pt %) act/default-actions))
+  [ent]
+  (when-let [target @act-target]
+    (filter #(act/can? @world ent target %) @default-action-seq)))
 
 (defn default-action
-  [ent pt]
-  (first (default-actions ent pt)))
+  [ent]
+  (first (default-actions ent)))
 
 (defn can-afford?
   ([action ent]
@@ -474,11 +495,15 @@
   ([action]
    (can-afford? action (first @selected))))
 
-(defn act-applies?
+(defn act-applies-at?
   [action ent pt]
   (act/applies? @world ent pt action))
 
 (defn can-act?
+  [action ent]
+  (act/can? @world ent @act-target action))
+
+(defn can-act-at?
   [action ent pt]
   (act/can? @world ent pt action))
 
@@ -494,7 +519,7 @@
      (can-act-at-player? action player)))
   ([action player]
    (when-let [pt (pos/pos player)]
-     (can-act? action (first @selected) pt))))
+     (can-act-at? action (first @selected) pt))))
 
 (def current-act-aoe
   (>>
@@ -509,7 +534,7 @@
   (>> (when-let [act @casting]
          (act/descr @world
                     (first @selected)
-                    @world-cell
+                    @act-target
                     act))))
 
 (defn do-act
@@ -517,8 +542,8 @@
   (event/put-act! action))
 
 (defn act
-  [action ent pt]
-  (do-act (act/prepare @world ent pt action)))
+  [action ent target]
+  (do-act (act/prepare @world ent target action)))
 
 (defn act-at-mouse
   ([action]

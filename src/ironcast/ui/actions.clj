@@ -22,11 +22,13 @@
                               :grey)
                        (gfx/draw-text! font text x y)))
 
+
+
 (defn draw-actions
   [world ent actions]
   (let [[x y] @api/screen-pos
-        pt @api/world-cell
-        strings (map-indexed #(textify %1 world ent pt %2) actions)
+        target @api/act-target
+        strings (map-indexed #(textify %1 world ent target %2) actions)
         bounds (map #(gfx/text-bounds @api/default-font %) strings)
         w (apply max (map first bounds))
         n (count actions)
@@ -38,15 +40,14 @@
            lh 4]
       (when (and act text h)
         (draw-action world ent act font text (+ x 36) (- y lh))
-        (recur actions strings bounds (+ lh (int h)))))))
+        (recur actions strings bounds (+ lh (int h) 7))))))
 
 (defn draw
   []
   (when-not @api/casting
     (let [ent (first @api/selected)
-          pt @api/world-cell
           world @state/world
-          actions (api/other-actions ent pt)]
+          actions (api/other-actions ent)]
       (when (and ent (seq actions))
         (draw-actions world ent actions)))))
 

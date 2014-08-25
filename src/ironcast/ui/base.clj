@@ -141,7 +141,7 @@
           (doseq [[wx wy :as pt] aoe
                   :let [x (* wx 32)
                         y (* (- height wy 1) 32)]]
-            (if (api/act-applies? spell caster pt)
+            (if (api/act-applies-at? spell caster pt)
               (gfx/with-color :light-yellow
                 (gfx/draw-sprite! spr
                                   (+ x 12)

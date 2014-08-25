@@ -2,7 +2,7 @@
   (:require [ironcast.internals.gfx :as gfx]
             [ironcast.gfx.world :as wgfx]
             [ironcast.util :refer :all]
-            [ironcast.ui.base :refer :all]
+            [ironcast.ui.base :refer :all :exclude [draw-stats]]
             [ironcast.api :as api]
             [clj-tuple :refer [tuple]]
             [ironcast.pure.attr :as attr]

@@ -14,7 +14,8 @@
             [ironcast.gfx.world :as wgfx]
             [clj-tuple :refer [tuple]]
             [ironcast.pure.attr :as attr]
-            [ironcast.pure.pos :as pos]))
+            [ironcast.pure.pos :as pos]
+            [ironcast.ui.actions :as actions]))
 
 (defn in-player-mouse
   [x y]
@@ -88,24 +89,7 @@
 (defn draw-item-hover
   [world player e x y]
   (when (api/mouse-in? x (+ y 32) 32 32)
-    (let [[x y] @api/screen-pos
-          x (+ x 32)
-          y y]
-      (gfx/draw-box! @api/blank
-                     x y 128 78
-                     :transparent-black
-                     :yellow)
-      (draw-text! (attr/attr world e :name "???")
-                  (+ x 10)
-                  (- y 10))
-      (when (attr/equipped? world player e)
-        (let [x (+ x 10)
-              y (- y 32)]
-          (draw-text! " 1. Unequip" x y)
-          (draw-text! " 2. Drop" x (- y 20)))
-        (when (api/key-hit? :num2)
-          (api/update-world
-            pos/drop-item player e))))))
+    (swap! state/ui assoc :act-target [:item e])))
 
 (defn draw-item
   [world player e x y]
@@ -142,5 +126,6 @@
         (draw-equipment world player x y)
         (draw-player player x y)
         (draw-stats world player (+ x 160) (- y 0))))
+    (actions/draw)
     (info/draw-info-pane)
     (draw-mouse)))

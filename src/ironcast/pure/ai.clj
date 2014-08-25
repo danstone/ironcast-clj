@@ -8,7 +8,8 @@
             [clojure.set :as set]
             [clj-tuple :refer [tuple]]
             [ironcast.pure.time :as time]
-            [ironcast.pure.act :as act]))
+            [ironcast.pure.act :as act]
+            [ironcast.pure.act-pos :as act-pos]))
 
 (defn done
   [world ent]
@@ -124,9 +125,9 @@
     (act [this world ent context]
       (let [enemy (:adj-enemy context)
             pt (pos world enemy)]
-        (when (and enemy pt (act/can? world ent pt act/attack-action))
+        (when (and enemy pt (act/can? world ent pt act-pos/attack-action))
           {:status :success
-           :actions [(act/prepare world ent pt act/attack-action)]})))))
+           :actions [(act/prepare world ent pt act-pos/attack-action)]})))))
 
 (def bfind-enemies
   (reify Behaviour
@@ -159,10 +160,10 @@
             pt (last path)]
         (when (and pt
                  path
-                 (act/can? world ent pt act/move-action)
+                 (act/can? world ent pt act-pos/move-action)
                  (<= (cost (pos world ent) (first path)) (current-ap world ent)))
           {:status :success
-           :actions [(act/prepare world ent pt act/move-action)]})))))
+           :actions [(act/prepare world ent pt act-pos/move-action)]})))))
 
 (def bspent
   (reify Behaviour
