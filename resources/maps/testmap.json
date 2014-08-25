@@ -91,6 +91,7 @@
                     {
                      "equip-sprite":":leather-armour-equip",
                      "flags":"#{:torso}",
+                     "name":"\"Leather Armour\"",
                      "slot":":torso",
                      "sprite":":leather-armour"
                     },

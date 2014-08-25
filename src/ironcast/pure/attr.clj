@@ -259,13 +259,18 @@
 
 (defn unequip
   [world ent item]
-  (-> (update-attr world ent disj item)
+  (-> (update-attr world ent :equip disj item)
       (rem-attr item :on)))
 
 (defn equip
   [world ent item]
   (-> (update-attr world ent :equip set-conj item)
       (add-attr item :on ent)))
+
+(defn equipped?
+  [world ent item]
+  (= (attr world item :on)
+     ent))
 
 (defn equipped
   [world ent]

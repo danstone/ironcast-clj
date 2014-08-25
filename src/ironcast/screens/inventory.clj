@@ -13,7 +13,8 @@
             [ironcast.state :as state]
             [ironcast.gfx.world :as wgfx]
             [clj-tuple :refer [tuple]]
-            [ironcast.pure.attr :as attr]))
+            [ironcast.pure.attr :as attr]
+            [ironcast.pure.pos :as pos]))
 
 (defn in-player-mouse
   [x y]
@@ -84,6 +85,35 @@
       (draw-slot! (+ x x2)
                   (- y y2)))))
 
+(defn draw-item-hover
+  [world player e x y]
+  (when (api/mouse-in? x (+ y 32) 32 32)
+    (let [[x y] @api/screen-pos
+          x (+ x 32)
+          y y]
+      (gfx/draw-box! @api/blank
+                     x y 128 78
+                     :transparent-black
+                     :yellow)
+      (draw-text! (attr/attr world e :name "???")
+                  (+ x 10)
+                  (- y 10))
+      (when (attr/equipped? world player e)
+        (let [x (+ x 10)
+              y (- y 32)]
+          (draw-text! " 1. Unequip" x y)
+          (draw-text! " 2. Drop" x (- y 20)))
+        (when (api/key-hit? :num2)
+          (api/update-world
+            pos/drop-item player e))))))
+
+(defn draw-item
+  [world player e x y]
+  (gfx/draw-sprite! (attr/attr world e :sprite)
+                    x
+                    y)
+  (draw-item-hover world player e x y))
+
 (defn draw-equipment
   [world player x y]
   (draw-labels x y)
@@ -93,10 +123,10 @@
             :let [slot (attr/attr world e :slot)
                   slot-pos (first (get slots slot))]
             :when slot-pos
-            :let [[x2 y2] slot-pos]]
-      (gfx/draw-sprite! (attr/attr world e :sprite)
-                        (+ x 64 x2)
-                        (- y 224 y2)))))
+            :let [[x2 y2] slot-pos
+                  x (+ x x2 64)
+                  y (- y y2 224)]]
+     (draw-item world player e x y))))
 
 (defn draw
   []

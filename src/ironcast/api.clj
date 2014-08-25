@@ -93,6 +93,10 @@
   "Deref to get the current screen height"
   (>> (setting :height)))
 
+(defn key-hit?
+  [key]
+  (-> @input :hit (get key) boolean))
+
 ;; UI
 
 (def ui-path

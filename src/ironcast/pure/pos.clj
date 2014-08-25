@@ -156,6 +156,7 @@
 (defn can-put?
   [world ent pt]
   (and (or (not-solid-at? world pt)
+           (item? world ent)
            (decor? world ent))
        (in-bounds? world pt)))
 
@@ -210,6 +211,11 @@
 (defn closed-at?
   [world pt]
   (pred-at? world closed? pt))
+
+(defn drop-item
+  [world ent item]
+  (-> (unequip world ent item)
+      (put item (pos world ent))))
 
 (defn closest-to-transition
   [world transition]
