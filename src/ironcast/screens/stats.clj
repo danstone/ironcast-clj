@@ -32,7 +32,7 @@
 (defn draw-player
   [player x y]
   (let [x (+ x 32)
-        y (- y 32)]
+        y (- y 32 6)]
     (draw-text! (api/attr player :name "???") x y)
     (wgfx/draw-creature @state/world
                         (first @api/selected)
@@ -40,6 +40,13 @@
                         (- y 96)
                         64
                         64)))
+
+(defn draw-shell
+  [x y w h]
+  (draw-blocks! x y 5 1)
+  (draw-blocks! (+ x 128) y 1 5)
+  (draw-blocks! x (- y 160) (/ w 32) 1)
+  (draw-blocks! (+ x 320) (- y 192) 1 (- (/ h 32) 5)))
 
 (defn draw
   []
@@ -51,7 +58,8 @@
       (let [[x y w h] @api/game-rect
             world @state/world
             player (first @api/selected)]
+        (draw-shell x y w h)
         (draw-player player x y)
-        (draw-stats world player (+ x 128) (- y 32))))
+        (draw-stats world player (+ x 160) (- y 0))))
     (info/draw-info-pane)
     (draw-mouse)))

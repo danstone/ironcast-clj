@@ -213,7 +213,7 @@
 (defn draw-stats
   [world ent x y]
   (gfx/with-color :light-yellow
-                  (gfx/draw-border! @api/blank x y 256 96 1))
+                  (gfx/draw-border! @api/blank x y 544 160 1))
   (let [x (+ x 6)
         y (- y 6)]
     (draw-hp world ent x y)
