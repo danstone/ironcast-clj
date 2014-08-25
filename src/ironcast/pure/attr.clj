@@ -121,6 +121,10 @@
   [world ent]
   (has-flag? world ent :decor))
 
+(defn item?
+  [world ent]
+  (has-flag? world ent :item))
+
 (defn transition?
   [world ent]
   (has-flag? world ent :transition))
@@ -262,6 +266,15 @@
   [world ent item]
   (-> (update-attr world ent :equip set-conj item)
       (add-attr item :on ent)))
+
+(defn equipped
+  [world ent]
+  (attr world ent :equip))
+
+(defn clear-equipped
+  [world ent]
+  (let [equipped (equipped world ent)]
+    (reduce #(unequip %1 ent %2) world equipped)))
 
 (def default-hp (tuple 10 10))
 

@@ -77,6 +77,7 @@
   (draw-by-flag world :floor)
   (draw-by-flag world :wall)
   (draw-by-flag world :decor)
+  (draw-by-flag world :item)
   (draw-circles world :enemy :red)
   (draw-circles world :selected :green)
   (draw-creatures world)

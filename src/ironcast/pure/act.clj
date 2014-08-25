@@ -284,6 +284,34 @@
   [world action]
   [(console-log world action)])
 
+;;PICKUP
+
+(def pickup-action
+  {:type :pickup
+   :name "Pickup"
+   :cost 1})
+
+(defmethod could? :pickup
+  [world ent pt _]
+  (and
+    (item-at? world pt)
+    (pos-adj? world ent pt)))
+
+(defmethod prepare :pickup
+  [world ent pt action]
+  (let [items (items-at world pt)]
+    (assoc action :ent ent
+                  :items items)))
+
+(defmethod try-perform :pickup
+  [world action]
+  (let [ent (:ent action)
+        items (:items action)]
+    (success
+      (reduce #(-> (unput %1 %2)
+                   (equip ent %2)) world items))))
+
+
 ;;TRAVEL
 
 (def transition-action
@@ -325,6 +353,7 @@
   [close-action
    open-action
    trip-action
+   pickup-action
    transition-action])
 
 (defn can-afford?

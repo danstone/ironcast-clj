@@ -60,6 +60,14 @@
   [world pt]
   (pred-at? world transition? pt))
 
+(defn item-at?
+  [world pt]
+  (pred-at? world item? pt))
+
+(defn items-at
+  [world pt]
+  (filter #(item? world %) (at world pt)))
+
 (defn creature-at
   [world pt]
   (pred-at world creature? pt))

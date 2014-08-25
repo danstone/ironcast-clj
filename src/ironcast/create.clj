@@ -14,10 +14,10 @@
       (add-flags ent flags)
       (add-attrs ent attrs)))
 
-(defn create-put
+(defn try-create-put
   [world ent flags attrs]
   (if (:pos attrs)
-    (-> (create world ent flags attrs)
+    (-> (create world ent flags (dissoc attrs :pos))
         (try-put ent (:pos attrs)))
     (fail world)))
 
@@ -30,27 +30,30 @@
 
 (defmethod try-create-obj :floor
   [world ent obj]
-  (create-put world ent #{:floor} obj))
+  (try-create-put world ent #{:floor} obj))
 
 (defmethod try-create-obj :wall
   [world ent obj]
-  (create-put world ent #{:wall :solid :opaque} obj))
+  (try-create-put world ent #{:wall :solid :opaque} obj))
 
 (defmethod try-create-obj :decor
   [world ent obj]
-  (create-put world ent #{:decor} obj))
+  (try-create-put world ent #{:decor} obj))
 
 (defmethod try-create-obj :creature
   [world ent obj]
-  (create-put world ent (set/union #{:solid :creature}
+  (try-create-put world ent (set/union #{:solid :creature}
                                    (set (:flags obj)))
               (dissoc obj :flags)))
 
 (defmethod try-create-obj :item
   [world ent obj]
-  (create-put world ent (set/union #{:item}
-                                   (set (:flags obj)))
-              (dissoc obj :flags)))
+  (let [flags (set/union #{:item}
+                         (set (:flags obj)))
+        attr (dissoc obj :flags)]
+    (if (:pos obj)
+      (try-create-put world ent flags attr)
+      (success (create world ent flags attr)))))
 
 (defmethod try-create-obj :door
   [world ent obj]
@@ -64,11 +67,11 @@
 
 (defmethod try-create-obj :start
   [world ent obj]
-  (create-put world ent #{:start} obj))
+  (try-create-put world ent #{:start} obj))
 
 (defmethod try-create-obj :transition
   [world ent obj]
-  (create-put world ent #{:transition} obj))
+  (try-create-put world ent #{:transition} obj))
 
 
 (defn objectify-terrain
@@ -109,6 +112,21 @@
   (-> obj
       (update :open-sprite #(db/find-sprite db % %))
       (update :closed-sprite #(db/find-sprite db % %))))
+
+(defmethod cook-obj :item
+  [db obj]
+  (-> obj
+      (update :sprite #(db/find-sprite db % %))
+      (update :equip-sprite #(db/find-sprite db % %))
+      (dissoc :attrs :equip)
+      (merge (:attrs obj))))
+
+(defmethod cook-obj :creature
+  [db obj]
+  (-> obj
+      (update :sprite #(db/find-sprite db % %))
+      (dissoc :attrs :equip)
+      (merge (:attrs obj))))
 
 (defn create!
   [obj]
@@ -160,7 +178,8 @@
   [world ent]
   {:ent ent
    :attrs (all world ent)
-   :flags (all-flags world ent)})
+   :flags (all-flags world ent)
+   :equip (map #(snapshot world %) (equipped world ent))})
 
 (defn transition-to!
   [to]
@@ -172,18 +191,19 @@
       (dosync (ref-set state/world new))
       (create-world! (-> db :tiled-maps (get to))))
     (let [players (map #(snapshot world %) (players world))
-          removed (remove-all-players world)
+          removed (reduce clear-equipped world players)
+          removed (remove-all-players removed)
           starts (starting-pts @state/world)]
       (swap! state/db assoc-in [:worlds (:name removed)] removed)
-      (println starts)
-      (println players)
       (doseq [[player pt] (map vector players starts)]
         (println "putting player at" pt)
         (create! (-> (assoc player
                           :pos pt
-                          :type :creature)
-                      (dissoc :attrs)
-                      (merge (:attrs player))))))))
+                          :type :creature)))
+        (doseq [equip (:equip player)]
+          (create! (-> (assoc equip
+                         :type :item)
+                       (dissoc :pos))))))))
 
 
 
