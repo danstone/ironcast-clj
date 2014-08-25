@@ -6,7 +6,8 @@
             [ironcast.api :as api]
             [ironcast.ui.base :as base]
             [ironcast.screens.main :as main]
-            [ironcast.screens.stats :as stats]))
+            [ironcast.screens.stats :as stats]
+            [ironcast.screens.inventory :as inv]))
 
 
 (defn draw-game
@@ -44,4 +45,5 @@
       b
       (case (:selected-menu @state/ui)
         :stats (stats/draw)
+        :inventory (inv/draw)
         (draw-main)))))

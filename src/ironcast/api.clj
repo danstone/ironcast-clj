@@ -74,6 +74,9 @@
   "Deref to get the `block` sprite - assumes an initialsed game."
   (delay (sprite :block)))
 
+(def slot
+  (delay (sprite :slot)))
+
 (def blank
   "Deref to get the `blank` sprite - assumes an initialised game"
   (delay (sprite :blank)))

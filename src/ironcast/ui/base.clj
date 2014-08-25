@@ -44,6 +44,21 @@
        (dotimes [yi h]
          (draw-block! (+ x (* 32 xi))
                       (- y (* 32 yi))))))))
+(defn draw-slot!
+  ([x y]
+   (gfx/draw-sprite! @api/slot x y))
+  ([x y width height]
+   (gfx/draw-sprite! @api/slot x y width height)))
+
+(defn draw-slots!
+  ([[x y w h]]
+   (draw-slot! x y w h))
+  ([x y w h]
+   (let [y (- y 32)]
+     (dotimes [xi w]
+       (dotimes [yi h]
+         (draw-slot! (+ x (* 32 xi))
+                      (- y (* 32 yi))))))))
 
 (defn draw-hover-border!
   [x y w h]
@@ -89,7 +104,7 @@
                       w h)))
 (defn draw-fatigue
   [world ent x y]
-  (let [fatigue (str "fatigue " (attr/fatigue world ent))
+  (let [fatigue (str "fatigue: " (attr/fatigue world ent))
         [w h] (gfx/text-bounds @api/default-font fatigue)]
     (draw-hover-text! @api/default-font fatigue x y
                       x (- y 16)
