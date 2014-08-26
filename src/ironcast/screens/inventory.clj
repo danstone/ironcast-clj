@@ -64,17 +64,21 @@
       (draw-text! "cloak: " x (- y 32))
       (draw-text! "misc: " x (- y 64)))
     (draw-text! "hands: " x (- y 128))
-    (draw-text! "gear: " x (- y 192 12))))
+    (draw-text! "gear: " x (- y 192 14))
+    (draw-text! "floor: " x (- y 288 14))))
 
 (def slots
   {:head [(tuple 0 0)]
    :torso [(tuple 0 32)]
-   :boots [(tuple 0 64)]
-   :hands [(tuple 0 128) (tuple 32 128)]
+   :boot [(tuple 0 64)]
+   :hand [(tuple 0 128) (tuple 32 128)]
    :gear (for [x (range 6)
                y (range 2)]
            (tuple (* 32 x) (+ 192 (* 32 y))))
-   :gloves [(tuple 96 0)]
+   :floor (for [x (range 6)
+                y (range 2)]
+            (tuple (* 32 x) (+ 288 (* 32 y))))
+   :glove [(tuple 96 0)]
    :cloak [(tuple 96 32)]
    :misc [(tuple 96 64) (tuple 128 64) (tuple 160 64)]})
 
@@ -87,16 +91,16 @@
                   (- y y2)))))
 
 (defn draw-item-hover
-  [world player e x y]
+  [e x y]
   (when (api/mouse-in? x (+ y 32) 32 32)
     (swap! state/ui assoc :act-target [:item e])))
 
 (defn draw-item
-  [world player e x y]
+  [world e x y]
   (gfx/draw-sprite! (attr/attr world e :sprite)
                     x
                     y)
-  (draw-item-hover world player e x y))
+  (draw-item-hover e x y))
 
 (defn draw-equipment
   [world player x y]
@@ -104,13 +108,34 @@
   (draw-slots x y)
   (let [equip (attr/equipped world player)]
     (doseq [e equip
-            :let [slot (attr/attr world e :slot)
-                  slot-pos (first (get slots slot))]
+            :let [in (attr/attr world e :in)
+                  slot (attr/attr world e :slot)
+                  slot-pos (nth (get slots slot) in nil)]
             :when slot-pos
             :let [[x2 y2] slot-pos
                   x (+ x x2 64)
                   y (- y y2 224)]]
-     (draw-item world player e x y))))
+     (draw-item world e x y))))
+
+(defn draw-on-floor
+  [world player x y]
+  (let [pt (pos/pos world player)
+        items (pos/items-at world pt)]
+   (doseq [[e [x2 y2]] (map tuple items (:floor slots))
+           :when (and x2 y2)
+           :let [x (+ x x2 64)
+                 y (- y y2 224)]]
+     (draw-item world e x y))))
+
+(defn draw-bag
+  [world x y]
+  (loop [items (:bag world)
+         x (+ x 352)
+         y (- y 224)]
+    (let [item (first items)]
+      (when item
+        (draw-item world item x y)
+        (recur (rest items) (+ x 32) y)))))
 
 (defn draw
   []
@@ -124,8 +149,14 @@
             player (first @api/selected)]
         (draw-shell x y w h)
         (draw-equipment world player x y)
+        (draw-on-floor world player x y)
+        (draw-bag world x y)
         (draw-player player x y)
-        (draw-stats world player (+ x 160) (- y 0))))
+        (draw-stats world player (+ x 160) (- y 0))
+        (debug/draw-fps x y)))
+    (controls/draw-descr-bar)
+    (controls/draw-action-buttons)
+    (controls/draw-action-bar)
     (actions/draw)
     (info/draw-info-pane)
     (draw-mouse)))

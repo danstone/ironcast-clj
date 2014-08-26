@@ -235,8 +235,7 @@
   (let [ent (:ent action)
         items (:items action)]
     (success
-      (reduce #(-> (unput %1 %2)
-                   (equip ent %2)) world items))))
+      (reduce pickup-item world items))))
 
 
 ;;TRAVEL

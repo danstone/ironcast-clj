@@ -257,16 +257,6 @@
       (add-attr ent
         :sprite (attr world ent :closed-sprite))))
 
-(defn unequip
-  [world ent item]
-  (-> (update-attr world ent :equip disj item)
-      (rem-attr item :on)))
-
-(defn equip
-  [world ent item]
-  (-> (update-attr world ent :equip set-conj item)
-      (add-attr item :on ent)))
-
 (defn equipped?
   [world ent item]
   (= (attr world item :on)
@@ -275,6 +265,56 @@
 (defn equipped
   [world ent]
   (attr world ent :equip))
+
+(defn bag
+  [world item]
+  (update world :bag set-conj item))
+
+(defn unbag
+  [world item]
+  (update world :bag disj item))
+
+(defn unequip
+  [world ent item]
+  (-> (update-attr world ent :equip disj item)
+      (rem-attr item :on)
+      (rem-attr item :in)
+      (bag item)))
+
+(defn same-slot?
+  [world item item2]
+  (= (attr world item :slot)
+     (attr world item2 :slot)))
+
+(def slots
+  {:hand 2
+   :torso 1})
+
+(defn find-index
+  [world ent item]
+  (let [r (range (get slots (attr world item :slot)))
+        in (->> (equipped world ent)
+                (filter #(same-slot? world item %1))
+                (map #(attr world % :in))
+                set)]
+    (first (filter (complement in) r))))
+
+(defn can-equip?
+  [world ent item]
+  (and
+    (not= ent (attr world item :on))
+    (< (find-index world ent item)
+       (get slots (attr world item :slot)))))
+
+(defn equip
+  [world ent item]
+  (if (can-equip? world ent item)
+    (-> (update-attr world ent :equip set-conj item)
+        (add-attr item :on ent)
+        (add-attr item :in (find-index world ent item))
+        (unbag item))
+    world))
+
 
 (defn clear-equipped
   [world ent]

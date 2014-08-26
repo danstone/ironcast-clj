@@ -74,4 +74,4 @@
 
 (def action-buttons
   [[0 :cast :mouse-magic "Spells & Abilities"]
-   [1 :use :inventory "Use Quick Items"]])
+   [1 :use :inventory "Use Gear"]])

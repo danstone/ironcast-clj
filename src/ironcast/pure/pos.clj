@@ -212,9 +212,15 @@
   [world pt]
   (pred-at? world closed? pt))
 
+(defn pickup-item
+  [world item]
+  (-> (unput world item)
+      (bag item)))
+
 (defn drop-item
   [world ent item]
   (-> (unequip world ent item)
+      (unbag item)
       (put item (pos world ent))))
 
 (defn closest-to-transition

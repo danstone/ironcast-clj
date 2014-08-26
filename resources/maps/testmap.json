@@ -100,6 +100,40 @@
                  "width":32,
                  "x":480,
                  "y":512
+                }, 
+                {
+                 "height":32,
+                 "name":"sword",
+                 "properties":
+                    {
+                     "equip-sprite":":sword-equip",
+                     "flags":"#{:hand}",
+                     "name":"\"Sword\"",
+                     "slot":":hand",
+                     "sprite":":sword"
+                    },
+                 "type":":item",
+                 "visible":true,
+                 "width":32,
+                 "x":512,
+                 "y":512
+                }, 
+                {
+                 "height":32,
+                 "name":"sword",
+                 "properties":
+                    {
+                     "equip-sprite":":sword-equip",
+                     "flags":"#{:hand}",
+                     "name":"\"Sword\"",
+                     "slot":":hand",
+                     "sprite":":sword"
+                    },
+                 "type":":item",
+                 "visible":true,
+                 "width":32,
+                 "x":512,
+                 "y":480
                 }],
          "opacity":1,
          "type":"objectgroup",
