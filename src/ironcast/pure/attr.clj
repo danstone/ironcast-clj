@@ -306,12 +306,24 @@
     (< (find-index world ent item)
        (get slots (attr world item :slot)))))
 
+(defn hand?
+  [world item]
+  (= (attr world item :slot) :hand))
+
+(defn flip-hand
+  [world item]
+  (if (and (hand? world item)
+           (= 1 (attr world item :in)))
+    (add-flag world item :flip)
+    world))
+
 (defn equip
   [world ent item]
   (if (can-equip? world ent item)
     (-> (update-attr world ent :equip set-conj item)
         (add-attr item :on ent)
         (add-attr item :in (find-index world ent item))
+        (flip-hand item)
         (unbag item))
     world))
 
