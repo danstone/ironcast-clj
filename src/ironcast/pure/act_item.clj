@@ -12,7 +12,8 @@
 
 (defmethod could? :drop
   [world ent target action]
-  (equipped? world ent target))
+  (or (equipped? world ent target)
+      (in-bag? world target)))
 
 (defmethod prepare :drop
   [world ent target action]
@@ -57,7 +58,6 @@
       (reduce pickup-item world items))))
 
 ;;EQUIP
-
 (def equip-action
   {:type :equip-item
    :name "Equip"
@@ -65,7 +65,7 @@
 
 (defmethod could? :equip-item
   [world ent target _]
-  (can-equip? world ent target))
+  (not (equipped? world ent target)))
 
 (defmethod prepare :equip-item
   [world ent target action]
@@ -80,6 +80,56 @@
       (reduce #(-> (pickup-item %1 %2)
                    (equip ent %2)) world items))))
 
+
+;;EQUIP L
+(def equip-left-action
+  {:type :equip-left-item
+   :name "Equip (Left)"
+   :cost 1})
+
+(defmethod could? :equip-left-item
+  [world ent target _]
+  (and (hand? world target)
+    (not (equipped? world ent target))))
+
+(defmethod prepare :equip-left-item
+  [world ent target action]
+  (assoc action :ent ent
+                :items [target]))
+
+(defmethod try-perform :equip-left-item
+  [world action]
+  (let [ent (:ent action)
+        items (:items action)]
+    (success
+      (reduce #(-> (pickup-item %1 %2)
+                   (equip-left ent %2)) world items))))
+
+;;EQUIP R
+(def equip-right-action
+  {:type :equip-right-item
+   :name "Equip (Right)"
+   :cost 1})
+
+(defmethod could? :equip-right-item
+  [world ent target _]
+  (and (hand? world target)
+       (not (equipped? world ent target))))
+
+(defmethod prepare :equip-right-item
+  [world ent target action]
+  (assoc action :ent ent
+                :items [target]))
+
+(defmethod try-perform :equip-right-item
+  [world action]
+  (let [ent (:ent action)
+        items (:items action)]
+    (success
+      (reduce #(-> (pickup-item %1 %2)
+                   (equip-right ent %2)) world items))))
+
+;;UNEQUIP
 
 (def unequip-action
   {:type :unequip-item
@@ -104,6 +154,8 @@
 
 (def other-actions
   [equip-action
+   equip-right-action
+   equip-left-action
    unequip-action
    drop-action
    pickup-action])

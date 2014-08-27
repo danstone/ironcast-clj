@@ -274,11 +274,17 @@
   [world item]
   (update world :bag disj item))
 
+(defn in-bag?
+  [world item]
+  (when-let [b (:bag world)]
+    (contains? b item)))
+
 (defn unequip
   [world ent item]
   (-> (update-attr world ent :equip disj item)
       (rem-attr item :on)
       (rem-attr item :in)
+      (rem-flag item :flip)
       (bag item)))
 
 (defn same-slot?
@@ -287,8 +293,14 @@
      (attr world item2 :slot)))
 
 (def slots
-  {:hand 2
-   :torso 1})
+  {:head 1
+   :torso 1
+   :boot 1
+   :glove 1
+   :cloak 1
+   :misc 3
+   :hand 2
+   :gear 12})
 
 (defn find-index
   [world ent item]
@@ -310,6 +322,24 @@
   [world item]
   (= (attr world item :slot) :hand))
 
+(defn hands
+  [world ent]
+  (filter #(hand? world %) (equipped world ent)))
+
+(defn left-hand
+  [world ent]
+  (let [[a b] (hands world ent)]
+    (cond
+      (and a (= (attr world a :in) 1)) a
+      (and b (= (attr world b :in) 1)) b)))
+
+(defn right-hand
+  [world ent]
+  (let [[a b] (hands world ent)]
+    (cond
+      (and a (= (attr world a :in) 0)) a
+      (and b (= (attr world b :in) 0)) b)))
+
 (defn flip-hand
   [world item]
   (if (and (hand? world item)
@@ -318,15 +348,30 @@
     world))
 
 (defn equip
-  [world ent item]
-  (if (can-equip? world ent item)
-    (-> (update-attr world ent :equip set-conj item)
-        (add-attr item :on ent)
-        (add-attr item :in (find-index world ent item))
-        (flip-hand item)
-        (unbag item))
-    world))
+  ([world ent item index]
+   (if (can-equip? world ent item)
+     (-> (update-attr world ent :equip set-conj item)
+         (add-attr item :on ent)
+         (add-attr item :in index)
+         (flip-hand item)
+         (unbag item))
+     world))
+  ([world ent item]
+   (equip world ent item (find-index world ent item))))
 
+(defn equip-left
+  [world ent item]
+  (let [left (left-hand world ent)]
+    (cond-> world
+      left (unequip ent left)
+      :then (equip ent item 1))))
+
+(defn equip-right
+  [world ent item]
+  (let [left (right-hand world ent)]
+    (cond-> world
+            left (unequip ent left)
+            :then (equip ent item 0))))
 
 (defn clear-equipped
   [world ent]

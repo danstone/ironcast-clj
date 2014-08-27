@@ -101,8 +101,10 @@
     (let [a (api/pos (first @api/selected))
           b @api/world-cell]
       (when (and a b)
-        (swap! state/ui assoc :los (seq (vis/player-los @state/world a b)))))
-    (swap! state/ui dissoc :los)))
+        (swap! state/ui assoc :los (seq (vis/player-los @state/world a b)))
+        nil))
+    (do (swap! state/ui dissoc :los)
+        nil)))
 
 (defn handle-info
   [handled comms]
@@ -110,7 +112,8 @@
     (let [mc @api/world-cell
           e (api/creature-aware-of-at mc)
           info (when e (tuple :ent e))]
-      (swap! state/ui assoc :info info))))
+      (swap! state/ui assoc :info info)
+      nil)))
 
 (defn handle-cast
   [handled comms]

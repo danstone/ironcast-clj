@@ -196,13 +196,18 @@
           removed (time/stop-motion removed)
           starts (starting-pts @state/world)
           starts (concat starts (mapcat adj starts))]
-      (swap! state/db assoc-in [:worlds (:name removed)] removed)
+      (swap! state/db assoc-in [:worlds (:name removed)] (dissoc removed :bag))
+      (dosync
+        (alter state/world assoc :bag (:bag world))
+        (alter state/world #(reduce (fn [world item]
+                                      (-> (add-attrs world item (all removed item))
+                                          (add-flags item (all-flags removed item)))) % (:bag world))))
       (doseq [[player pt] (map vector players starts)]
         (println "putting player at" pt)
         (create! (-> (assoc player
                           :pos pt
                           :type :creature)))
-        (doseq [equip (:equip player)]
+        (doseq [equip (concat (:equip player))]
           (create! (-> (assoc equip
                          :type :item)
                        (dissoc :pos))))))))
