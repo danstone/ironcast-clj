@@ -153,9 +153,9 @@
       (reduce #(unequip %1 ent %2) world items))))
 
 (def other-actions
-  [equip-action
+  [pickup-action
+   equip-action
    equip-right-action
    equip-left-action
    unequip-action
-   drop-action
-   pickup-action])
+   drop-action])

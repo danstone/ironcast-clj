@@ -315,8 +315,9 @@
   [world ent item]
   (and
     (not= ent (attr world item :on))
-    (< (find-index world ent item)
-       (get slots (attr world item :slot)))))
+    (when-let [ind (find-index world ent item)]
+      (< ind
+         (get slots (attr world item :slot) -1)))))
 
 (defn hand?
   [world item]
@@ -377,6 +378,10 @@
   [world ent]
   (let [equipped (equipped world ent)]
     (reduce #(unequip %1 ent %2) world equipped)))
+
+(defn quantity
+  [world item]
+  (attr world item :quantity 1))
 
 (def default-hp (tuple 10 10))
 

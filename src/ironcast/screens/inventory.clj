@@ -100,6 +100,9 @@
   (gfx/draw-sprite! (attr/attr world e :sprite)
                     x
                     y)
+  (let [q (attr/quantity world e)]
+    (when (> q 1)
+      (draw-text! (str q) (+ x 16) (+ y 12))))
   (draw-item-hover e x y))
 
 (defn draw-equipment

@@ -108,7 +108,41 @@
                     {
                      "equip-sprite":":sword-equip",
                      "flags":"#{:hand}",
-                     "name":"\"Sword\"",
+                     "name":"\"Sword 2\"",
+                     "slot":":hand",
+                     "sprite":":sword"
+                    },
+                 "type":":item",
+                 "visible":true,
+                 "width":32,
+                 "x":480,
+                 "y":544
+                }, 
+                {
+                 "height":32,
+                 "name":"sword 1",
+                 "properties":
+                    {
+                     "equip-sprite":":sword-equip",
+                     "flags":"#{:hand}",
+                     "name":"\"Sword 1\"",
+                     "slot":":hand",
+                     "sprite":":sword"
+                    },
+                 "type":":item",
+                 "visible":true,
+                 "width":32,
+                 "x":480,
+                 "y":480
+                }, 
+                {
+                 "height":32,
+                 "name":"sword",
+                 "properties":
+                    {
+                     "equip-sprite":":sword-equip",
+                     "flags":"#{:hand}",
+                     "name":"\"Sword 3\"",
                      "slot":":hand",
                      "sprite":":sword"
                     },
@@ -120,20 +154,20 @@
                 }, 
                 {
                  "height":32,
-                 "name":"sword",
+                 "name":"javelins",
                  "properties":
                     {
-                     "equip-sprite":":sword-equip",
                      "flags":"#{:hand}",
-                     "name":"\"Sword\"",
-                     "slot":":hand",
-                     "sprite":":sword"
+                     "name":"\"Javelin\"",
+                     "quantity":"50",
+                     "slot":":gear",
+                     "sprite":":javelin"
                     },
                  "type":":item",
                  "visible":true,
                  "width":32,
                  "x":512,
-                 "y":480
+                 "y":544
                 }],
          "opacity":1,
          "type":"objectgroup",
