@@ -17,6 +17,12 @@
 
 (defmulti act-applied (fn [world event] (:type event)))
 
+(defmethod act-applied :default [_ _] nil)
+
+(defmulti act-applying (fn [world event] (:type event)))
+
+(defmethod act-applying :default [_ _] nil)
+
 (defonce console-act-logger
   (let [c (chan)]
     (async/tap act-mult c)
@@ -29,6 +35,7 @@
 
 (defn act-apply
   [event]
+  (act-applying @state/world event)
   (dosync
     (let [w @state/world
           [nw success?] (act/applicate w event)]
@@ -53,7 +60,6 @@
                (.printStackTrace ^Exception e)))
       (recur))))
 
-(defmethod act-applied :default [_ _] nil)
 
 (defn attack-ent-shift
   [world event]
@@ -76,3 +82,7 @@
 (defmethod act-applied :transition
   [world event]
   (create/transition-to! (:to event)))
+
+(defmethod act-applying :create
+  [world event]
+  (create/create! (:obj event)))
