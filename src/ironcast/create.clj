@@ -1,94 +1,14 @@
 (ns ironcast.create
   (:require [ironcast.pure
              [attr :refer :all]
-             [pos :refer :all]]
+             [pos :refer :all]
+             [time :as time]
+             [create :refer :all]]
             [ironcast.util :refer :all]
             [ironcast.state :as state]
             [clojure.set :as set]
-            [ironcast.db :as db]
-            [ironcast.pure.time :as time]))
+            [ironcast.db :as db]))
 
-(defn create
-  [world ent flags attrs]
-  (-> world
-      (add-flags ent flags)
-      (add-attrs ent attrs)))
-
-(defn try-create-put
-  [world ent flags attrs]
-  (if (:pos attrs)
-    (-> (create world ent flags (dissoc attrs :pos))
-        (try-put ent (:pos attrs)))
-    (fail world)))
-
-(defmulti try-create-obj (fn [world ent obj]
-                           (:type obj)))
-
-(defmethod try-create-obj :default
-  [world _ obj]
-  (success world))
-
-(defmethod try-create-obj :floor
-  [world ent obj]
-  (try-create-put world ent #{:floor} obj))
-
-(defmethod try-create-obj :wall
-  [world ent obj]
-  (try-create-put world ent #{:wall :solid :opaque} obj))
-
-(defmethod try-create-obj :decor
-  [world ent obj]
-  (try-create-put world ent #{:decor} obj))
-
-(defmethod try-create-obj :creature
-  [world ent obj]
-  (try-create-put world ent (set/union #{:solid :creature}
-                                   (set (:flags obj)))
-              (dissoc obj :flags)))
-
-(defmethod try-create-obj :item
-  [world ent obj]
-  (let [flags (set/union #{:item}
-                         (set (:flags obj)))
-        attr (dissoc obj :flags)]
-    (if (:pos obj)
-      (try-create-put world ent flags attr)
-      (success (create world ent flags attr)))))
-
-(defmethod try-create-obj :door
-  [world ent obj]
-  (let [open? (:open? obj)
-        f (if open? open close)]
-    (-> (create world ent
-                #{:door :decor}
-                obj)
-        (f ent)
-        (try-put ent (:pos obj)))))
-
-(defmethod try-create-obj :start
-  [world ent obj]
-  (try-create-put world ent #{:start} obj))
-
-(defmethod try-create-obj :transition
-  [world ent obj]
-  (try-create-put world ent #{:transition} obj))
-
-
-(defn objectify-terrain
-  [terrain]
-  [(assoc terrain
-     :type (:terrain terrain))])
-
-(defn objectify-decor
-  [decor]
-  [(assoc decor
-     :type :decor)])
-
-(defn objectify-obj
-  [obj]
-  (for [pt (rect-pts (:rect obj))]
-    (assoc (update obj :type read-string)
-      :pos pt)))
 
 (defmulti cook-obj (fn [db obj] (:type obj)))
 
@@ -138,23 +58,18 @@
     (let [result
           (dosync
             (let [id (:ent obj @state/gid)
-                  [nw success?] (try-create-obj @state/world id cooked)]
-              (when success?
-                (ref-set state/world nw)
-                (alter state/gid inc)
-                id)))]
-      (if result
-        (println "created... " result)
-        (println "failed!")))))
+                  nw (push-obj @state/world id cooked)]
+              (ref-set state/world nw)
+              (alter state/gid inc)
+              id))]
+      (println "created... " result))))
 
 (defn create-world!
   [tiled-map]
   (dosync
     (alter state/world time/stop-motion))
   (println "creating world..." (-> tiled-map :name (or :???) name))
-  (let [world {:width  (:width tiled-map)
-               :height (:height tiled-map)
-               :name   (:name tiled-map)}]
+  (let [world (select-keys tiled-map [:width :height :name])]
     (dosync
       (ref-set state/world world))
     (println "created world..."  (:width world) "by" (:height world)))
